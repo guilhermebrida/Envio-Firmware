@@ -7,9 +7,11 @@ WORKDIR $APP_HOME
 
 RUN pip install poetry
 
+COPY . .
+
 RUN poetry install --no-root --no-dev
 
-COPY . .
+
 
 # ENV POSTGRES_HOST=localhost
 ENV POSTGRES_HOST=postgres
