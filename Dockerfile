@@ -5,9 +5,9 @@ RUN apt-get update && apt-get install -y libpq-dev python3-tk net-tools lsof && 
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 
-RUN pip install poetry
-
 COPY . .
+
+RUN pip install poetry
 
 RUN poetry install --no-root --no-dev
 
