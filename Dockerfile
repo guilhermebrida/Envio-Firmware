@@ -1,6 +1,6 @@
 FROM python:3.9-slim-buster
 
-RUN apt-get update && apt-get install -y libpq-dev python3-tk net-tools lsof python3-poetry && rm -rf /var/lib/apt/lists/* 
+RUN apt-get update && apt-get install -y libpq-dev python3-tk net-tools lsof && rm -rf /var/lib/apt/lists/* 
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME
