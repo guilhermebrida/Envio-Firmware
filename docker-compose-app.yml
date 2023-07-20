@@ -5,7 +5,7 @@ services:
     build: .
     restart: unless-stopped
     volumes:
-      - ./app:/app
+      - .:/app
     ports:
       - "10116:10116/udp"
     environment:
