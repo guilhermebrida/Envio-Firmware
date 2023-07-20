@@ -22,8 +22,8 @@ ENV POSTGRES_DB=postgres
 
 
 CMD ["poetry", "install","--no-root","--no-dev"]
-CMD ["ls"]
-CMD ["python", "-u","./app/FOTA.py"]
+
+CMD ["poetry", "run", "python", "./app/FOTA.py"]
 
 
 
