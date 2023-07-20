@@ -9,8 +9,6 @@ COPY . .
 
 RUN pip install poetry
 
-RUN ls
-RUN cat pyproject.toml
 RUN poetry install --no-root --no-dev
 
 
@@ -22,9 +20,8 @@ ENV POSTGRES_USER=postgres
 ENV POSTGRES_PASSWORD=postgres
 ENV POSTGRES_DB=postgres
 
-# CMD ["python", "-u","./app/udp-server.py"]
-# CMD ["python", "-u","./app/server.py"]
-CMD ["python", "-u","./app/FOTA.py"]
+# CMD ["python", "-u","./app/FOTA.py"]
+CMD ["ls"]
 
 
 
