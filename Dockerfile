@@ -20,10 +20,10 @@ ENV POSTGRES_USER=postgres
 ENV POSTGRES_PASSWORD=postgres
 ENV POSTGRES_DB=postgres
 
-# CMD ["python", "-u","./app/FOTA.py"]
+
 CMD ["poetry", "install","--no-root","--no-dev"]
 CMD ["ls"]
-
+CMD ["python", "-u","./app/FOTA.py"]
 
 
 
