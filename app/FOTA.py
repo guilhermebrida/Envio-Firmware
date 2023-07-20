@@ -1,7 +1,7 @@
 import socket
 import XVM
 import re
-# import psycopg2
+import psycopg2
 import os
 import time
 import asyncio
