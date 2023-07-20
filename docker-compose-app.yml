@@ -1,11 +1,10 @@
 version: "3.9"
 
 services:
-  app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
-    volumes:
-      - .:/app
     ports:
       - "10116:10116/udp"
     environment:
