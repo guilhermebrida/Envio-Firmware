@@ -19,7 +19,7 @@ services:
       context: .
     depends_on:
       - postgres
-    restart: unless-stopped
+    restart: always
     ports:
       - "10116:10116/udp"
     environment:
