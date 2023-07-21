@@ -14,20 +14,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
 
-  app:
-    build:
-      context: .
-    depends_on:
-      - postgres
-    restart: always
-    ports:
-      - "10116:10116/udp"
-    environment:
-      - ENDPOINT=postgres
-    networks:
-      - backing-services
-
-
   # socat:
   #   image: alpine/socat
   #   command: socat TCP4-LISTEN:10116,fork,reuseaddr TCP4:127.0.0.1:10117

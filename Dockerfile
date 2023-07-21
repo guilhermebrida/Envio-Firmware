@@ -11,19 +11,14 @@ RUN pip install poetry
 
 RUN poetry install --no-root --no-dev
 
-
-
-# ENV POSTGRES_HOST=localhost
 ENV POSTGRES_HOST=postgres
 ENV POSTGRES_PORT=5432
 ENV POSTGRES_USER=postgres
 ENV POSTGRES_PASSWORD=postgres
 ENV POSTGRES_DB=postgres
 
-
-# CMD ["poetry", "install","--no-root","--no-dev"]
-
-CMD ["poetry", "run", "python", "./app/FOTA.py"]
+CMD ["poetry", "run", "python", "-u", "./app/FOTA.py"]
+# CMD ["python", "-u","./app/FOTA.py"]
 
 
 
