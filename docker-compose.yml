@@ -14,6 +14,19 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
 
+  app:
+    build:
+      context: .
+    restart: unless-stopped
+    ports:
+      - "10116:10116/udp"
+    environment:
+      - ENDPOINT=postgres
+    # external_links:
+    #   - envio-firmware-postgres-1
+    networks:
+      - backing-services
+
 
   # socat:
   #   image: alpine/socat
