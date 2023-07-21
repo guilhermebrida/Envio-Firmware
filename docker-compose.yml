@@ -17,13 +17,14 @@ services:
   app:
     build:
       context: .
+    depends_on:
+      - postgres
     restart: unless-stopped
     ports:
       - "10116:10116/udp"
     environment:
       - ENDPOINT=postgres
-    # external_links:
-    #   - envio-firmware-postgres-1
+    depends
     networks:
       - backing-services
 
