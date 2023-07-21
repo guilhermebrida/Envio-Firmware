@@ -24,7 +24,6 @@ services:
       - "10116:10116/udp"
     environment:
       - ENDPOINT=postgres
-    depends
     networks:
       - backing-services
 
