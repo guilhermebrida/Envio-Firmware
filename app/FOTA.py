@@ -8,9 +8,8 @@ import asyncio
 import selectors
 import time
 from tenacity import retry, stop_after_delay, wait_fixed, stop_after_attempt, TryAgain
-from sqlalchemy import create_engine, Column, String, LargeBinary, DateTime, func
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, Column, String, LargeBinary, DateTime, func, select
+from sqlalchemy.orm import sessionmaker,declarative_base
 from datetime import datetime
 
 ips = []
@@ -27,25 +26,24 @@ arquivos = None
 BLOCOS = []
 LISTENED = []
 
-postgres_host = os.environ['POSTGRES_HOST']
-postgres_port = os.environ['POSTGRES_PORT']
-postgres_user = os.environ['POSTGRES_USER']
-postgres_password = os.environ['POSTGRES_PASSWORD']
-postgres_db = os.environ['POSTGRES_DB']
+# postgres_host = os.environ['POSTGRES_HOST']
+# postgres_port = os.environ['POSTGRES_PORT']
+# postgres_user = os.environ['POSTGRES_USER']
+# postgres_password = os.environ['POSTGRES_PASSWORD']
+# postgres_db = os.environ['POSTGRES_DB']
 
-connection = psycopg2.connect(
-    host=postgres_host,
-    # host="postgres",
-    port=postgres_port,
-    user=postgres_user,
-    password=postgres_password,
-    dbname=postgres_db
-)
+# connection = psycopg2.connect(
+#     host=postgres_host,
+#     # host="postgres",
+#     port=postgres_port,
+#     user=postgres_user,
+#     password=postgres_password,
+#     dbname=postgres_db
+# )
 
-cursor = connection.cursor()
+# cursor = connection.cursor()
 
-# engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
-engine = create_engine(f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}')
+
 
 
 host = '0.0.0.0'
@@ -55,6 +53,9 @@ blocos_de_dados = [...]
 
 
 
+
+engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
+# engine = create_engine(f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}')
 Base = declarative_base()
 
 class Firmware(Base):
@@ -67,11 +68,12 @@ class Firmware(Base):
     send_datetime = Column(DateTime, default=func.timezone('America/Sao_Paulo', func.now()))
     reception_datetime = Column(DateTime, default=func.timezone('America/Sao_Paulo', func.now()))
 
+    def __repr__(self):
+        return f"Firmware(device_id={self.device_id}, SN={self.SN}, ...)"
+
 
 Session = sessionmaker(bind=engine)
 session = Session()
-
-
 
 novo_firmware = Firmware(
     device_id='id_do_dispositivo',
@@ -176,18 +178,18 @@ def enviar_mensagem_udp(sock, addr, mensagem):
 
 
 
-def criar(device_id,vozes):
-    try:
-        sn = RSN_DICT[device_id]
-        cursor.execute('INSERT INTO vozes ("IMEI", "SN", "VOZES") values (\'{}\', \'{}\', \'{}\');'.format(device_id, sn,vozes))
-        connection.commit()
-    except:
-        pass
-    finally:
-        cursor.execute('SELECT "IMEI" FROM vozes;')
-        results = cursor.fetchall()
-        ID = [result[0] for result in results]
-        print('Ids no banco:',ID)
+# def criar(device_id,vozes):
+#     try:
+#         sn = RSN_DICT[device_id]
+#         cursor.execute('INSERT INTO vozes ("IMEI", "SN", "VOZES") values (\'{}\', \'{}\', \'{}\');'.format(device_id, sn,vozes))
+#         connection.commit()
+#     except:
+#         pass
+#     finally:
+#         cursor.execute('SELECT "IMEI" FROM vozes;')
+#         results = cursor.fetchall()
+#         ID = [result[0] for result in results]
+#         print('Ids no banco:',ID)
 
 
 async def main():
@@ -210,6 +212,8 @@ async def main():
             for bloco in blocos_de_dados:
                     # await enviar_bloco(sock, bloco, addr)
                 fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=bloco)
+                session.add(fw)
+                session.commit()
                 enviar_mensagem_udp(sock, addr, bloco)
             equipamentos_executados[ip_equipamento] = True
             print(equipamentos_executados)
@@ -224,13 +228,13 @@ if __name__ == "__main__":
     try:
         pasta_vozes = "./app/Files/Vozes/"
         pasta_scripts = "./app/Files/Prod_script/"
-        path_voz = find(pasta_vozes)
+        # path_voz = find(pasta_vozes)
         # print("Arquivos de Voz:",path_voz)
-        path = []
-        path_script = find(pasta_scripts)
+        # path = []
+        # path_script = find(pasta_scripts)
         # print("Script basico:",path_script)
-        if path_voz:
-            asyncio.run(main())
+        # if path_voz:
+        asyncio.run(main())
             # servidor_udp()
     except KeyboardInterrupt:
         pass
