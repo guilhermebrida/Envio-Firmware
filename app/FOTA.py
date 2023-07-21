@@ -196,9 +196,11 @@ async def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((host, porta))
     # sock.setblocking(False)
+    print((host, porta))
     while True:
         data, addr = sock.recvfrom(1024)
         ip_equipamento = addr[0]
+        print(data,ip_equipamento)
         # if ip_equipamento not in equipamentos_executados:
         if re.search('BINA.*',data.decode(errors='ignore')) is None:
             xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
