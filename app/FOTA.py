@@ -192,7 +192,7 @@ def enviar_mensagem_udp(sock, addr, mensagem):
 #         print('Ids no banco:',ID)
 
 
-async def main():
+def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((host, porta))
     # sock.setblocking(False)
@@ -228,6 +228,7 @@ async def main():
 
 if __name__ == "__main__":
     try:
+        print(__name__ )
         pasta_vozes = "./app/Files/Vozes/"
         pasta_scripts = "./app/Files/Prod_script/"
         # path_voz = find(pasta_vozes)
@@ -236,7 +237,7 @@ if __name__ == "__main__":
         # path_script = find(pasta_scripts)
         # print("Script basico:",path_script)
         # if path_voz:
-        asyncio.run(main())
+        main()
             # servidor_udp()
     except KeyboardInterrupt:
         pass
