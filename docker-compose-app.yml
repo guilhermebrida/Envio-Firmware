@@ -10,8 +10,8 @@ services:
       - "10116:10116/udp"
     environment:
       - ENDPOINT=postgres
-    # external_links:
-      # - docker_python-postgres-1
+    external_links:
+      - envio-firmware-postgres-1
     networks:
       - backing-services
 
