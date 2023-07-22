@@ -167,9 +167,9 @@ def enviar_mensagem_udp(sock, addr, mensagem, device_id):
     if time.time() - start_time >= timeout:
         print("timeout")
         raise TryAgain
-    Firmware.update().where(Firmware.device_id == device_id 
-                            and Firmware.content_blocs == mensagem 
-                            ).values(reception_datetime=datetime.now())
+    # Firmware.update().where(Firmware.device_id == device_id 
+    #                         and Firmware.content_blocs == mensagem 
+    #                         ).values(reception_datetime=datetime.now())
     return response
 
 
