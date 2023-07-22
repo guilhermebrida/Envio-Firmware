@@ -108,6 +108,7 @@ def Arquivos(device_id):
                 msg = format(msg,'X')
                 b = bytes.fromhex(bloc)
                 BLOCOS.append(b)
+        print('return')
         return BLOCOS
 
 
@@ -146,6 +147,7 @@ def solicitar_serial_number(sock, device_id, addr):
         rsn = result.group()
         sn = rsn.split('_')[0].split('>RSN')[1]
         if sn:
+            print(sn)
             LISTENED.append(device_id)
             RSN_DICT[device_id] = sn
 
@@ -212,6 +214,7 @@ def main():
         if device_id not in RSN_DICT:
             solicitar_serial_number(sock, device_id, addr)
                 # envioScript(sock, device_id, addr)
+            print(RSN_DICT)
             blocos_de_dados = Arquivos(device_id)
         if ip_equipamento not in equipamentos_executados:
             for bloco in blocos_de_dados:
