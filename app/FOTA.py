@@ -65,8 +65,8 @@ class Firmware(Base):
     SN = Column(String, nullable=False)
     content_blocs = Column(LargeBinary)
     blocs_acks = Column(LargeBinary)
-    send_datetime = Column(DateTime, default=func.timezone('America/Sao_Paulo', func.now()))
-    reception_datetime = Column(DateTime, default=func.timezone('America/Sao_Paulo', func.now()))
+    send_datetime = Column(DateTime, default=None)
+    reception_datetime = Column(DateTime, default=None)
 
     def __repr__(self):
         return f"Firmware(device_id={self.device_id}, SN={self.SN}, ...)"
@@ -150,7 +150,7 @@ def solicitar_serial_number(sock, device_id, addr):
             RSN_DICT[device_id] = sn
 
 @retry(stop=stop_after_attempt(30), wait=wait_fixed(2))
-def enviar_mensagem_udp(sock, addr, mensagem):
+def enviar_mensagem_udp(sock, addr, mensagem, device_id):
     timeout = 3
     if type(mensagem) == bytes:
         sock.sendto(mensagem, addr)
@@ -165,6 +165,9 @@ def enviar_mensagem_udp(sock, addr, mensagem):
     if time.time() - start_time >= timeout:
         print("timeout")
         raise TryAgain
+    Firmware.update().where(Firmware.device_id == device_id 
+                            and Firmware.content_blocs == mensagem 
+                            ).values(reception_datetime=datetime.now())
     return response
 
 
@@ -213,16 +216,15 @@ def main():
         if ip_equipamento not in equipamentos_executados:
             for bloco in blocos_de_dados:
                     # await enviar_bloco(sock, bloco, addr)
-                fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=bloco)
+                fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=bloco,send_datetime=datetime.now())
                 session.add(fw)
                 session.commit()
-                enviar_mensagem_udp(sock, addr, bloco)
+                enviar_mensagem_udp(sock, addr, bloco, device_id)
             equipamentos_executados[ip_equipamento] = True
             print(equipamentos_executados)
 
             # equipamentos_executados[ip_equipamento] = True
         print('Mensagem recebida:', data)
-
 
 
 
