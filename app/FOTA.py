@@ -197,7 +197,7 @@ def enviar_mensagem_udp(sock, addr, mensagem, device_id):
 #         print('Ids no banco:',ID)
 
 
-def main():
+async def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((host, porta))
     # sock.setblocking(False)
@@ -207,7 +207,7 @@ def main():
         ip_equipamento = addr[0]
         print(data,ip_equipamento)
         # if ip_equipamento not in equipamentos_executados:
-        if re.search('BINA.*',data.decode(errors='ignore')) is None:
+        if re.search(b'BINA.*',data) is None:
             xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
             msg = xvmMessage[0]
             device_id = xvmMessage[1]
@@ -242,7 +242,7 @@ if __name__ == "__main__":
         # path_script = find(pasta_scripts)
         # print("Script basico:",path_script)
         # if path_voz:
-        main()
+        asyncio.run(main())
             # servidor_udp()
     except KeyboardInterrupt:
         pass
