@@ -91,8 +91,8 @@ session.commit()
 def Arquivos(device_id):
         print(device_id)
         sn = RSN_DICT[device_id]
-        print(path_voz)
-        for files in path_voz:
+        # print(path_voz)
+        for files in path_fw:
             f=open(f'{files}','rb')
             conteudo = f.read()
             separar = [conteudo[i:i+520]for i in range(0,len(conteudo),520)]
@@ -229,9 +229,9 @@ def main():
 if __name__ == "__main__":
     try:
         print(__name__ )
-        pasta_vozes = "./app/Files/Vozes/"
-        pasta_scripts = "./app/Files/Prod_script/"
-        # path_voz = find(pasta_vozes)
+        # pasta_vozes = "./app/Files/Vozes/"
+        pasta_fw = "./app/Files/"
+        path_fw = find(pasta_fw)
         # print("Arquivos de Voz:",path_voz)
         # path = []
         # path_script = find(pasta_scripts)
