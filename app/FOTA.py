@@ -108,6 +108,9 @@ def Arquivos(device_id):
                 msg = format(msg,'X')
                 b = bytes.fromhex(bloc)
                 BLOCOS.append(b)
+                fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=bloco,send_datetime=datetime.now())
+                session.add(fw)
+                session.commit()
         print('return')
         return BLOCOS
 
@@ -217,12 +220,12 @@ async def main():
             print(RSN_DICT)
             blocos_de_dados = Arquivos(device_id)
         if ip_equipamento not in equipamentos_executados:
-            for bloco in blocos_de_dados:
-                    # await enviar_bloco(sock, bloco, addr)
-                fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=bloco,send_datetime=datetime.now())
-                session.add(fw)
-                session.commit()
-                enviar_mensagem_udp(sock, addr, bloco, device_id)
+            # for bloco in blocos_de_dados:
+            #         # await enviar_bloco(sock, bloco, addr)
+            #     fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=bloco,send_datetime=datetime.now())
+            #     session.add(fw)
+            #     session.commit()
+            #     enviar_mensagem_udp(sock, addr, bloco, device_id)
             equipamentos_executados[ip_equipamento] = True
             print(equipamentos_executados)
 
@@ -233,7 +236,6 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        print(__name__ )
         # pasta_vozes = "./app/Files/Vozes/"
         pasta_fw = "./app/Files/"
         path_fw = find(pasta_fw)
