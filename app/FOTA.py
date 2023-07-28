@@ -84,8 +84,8 @@ novo_firmware = Firmware(
     reception_datetime=datetime.now()
 )
 
-session.add(novo_firmware)
-session.commit()
+# session.add(novo_firmware)
+# session.commit()
 
 
 def Arquivos(device_id):
@@ -196,6 +196,12 @@ def enviar_mensagem_udp(sock, addr, mensagem):
 #         ID = [result[0] for result in results]
 #         print('Ids no banco:',ID)
 
+async def Verifica_tabela(device_id):
+    select = select([Firmware.blocs_acks]).where(Firmware.device_id == device_id 
+    and Firmware.blocs_acks == None).order_by(Firmware.send_datetime.asc())
+    result = await session.execute(select)
+    print(result)
+
 
 async def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -216,6 +222,8 @@ async def main():
                 # envioScript(sock, device_id, addr)
             print(RSN_DICT)
             blocos_de_dados = Arquivos(device_id)
+        if device_id in RSN_DICT:
+            Verifica_tabela(device_id)
         if ip_equipamento not in equipamentos_executados:
             # for bloco in blocos_de_dados:
             #         # await enviar_bloco(sock, bloco, addr)
