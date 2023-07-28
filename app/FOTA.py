@@ -155,7 +155,7 @@ def solicitar_serial_number(sock, device_id, addr):
             RSN_DICT[device_id] = sn
 
 @retry(stop=stop_after_attempt(30), wait=wait_fixed(2))
-def enviar_mensagem_udp(sock, addr, mensagem, device_id):
+def enviar_mensagem_udp(sock, addr, mensagem):
     timeout = 3
     if type(mensagem) == bytes:
         sock.sendto(mensagem, addr)
@@ -170,9 +170,6 @@ def enviar_mensagem_udp(sock, addr, mensagem, device_id):
     if time.time() - start_time >= timeout:
         print("timeout")
         raise TryAgain
-    # Firmware.update().where(Firmware.device_id == device_id 
-    #                         and Firmware.content_blocs == mensagem 
-    #                         ).values(reception_datetime=datetime.now())
     return response
 
 
