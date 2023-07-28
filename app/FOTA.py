@@ -108,9 +108,9 @@ def Arquivos(device_id):
                 msg = format(msg,'X')
                 b = bytes.fromhex(bloc)
                 BLOCOS.append(b)
-                fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=bloco,send_datetime=datetime.now())
+                fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=b,send_datetime=datetime.now())
                 session.add(fw)
-        session.commit()
+                session.commit()
         print('return')
         return BLOCOS
 
