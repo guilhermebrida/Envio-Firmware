@@ -153,14 +153,15 @@ def solicitar_serial_number(sock, device_id, addr):
     xvm = XVM.generateXVM(device_id, str(8000).zfill(4), '>QSN<')
     print(xvm)
     response = enviar_mensagem_udp(sock,addr,xvm)
-    result = re.search('>RSN.*', response.decode())
-    if result is not None:
-        rsn = result.group()
-        sn = rsn.split('_')[0].split('>RSN')[1]
-        if sn:
-            print(sn)
-            LISTENED.append(device_id)
-            RSN_DICT[device_id] = sn
+    if response is not None:
+        result = re.search('>RSN.*', response.decode())
+        if result is not None:
+            rsn = result.group()
+            sn = rsn.split('_')[0].split('>RSN')[1]
+            if sn:
+                print(sn)
+                LISTENED.append(device_id)
+                RSN_DICT[device_id] = sn
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(2))
 def enviar_mensagem_udp(sock, addr, mensagem):
