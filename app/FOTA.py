@@ -222,14 +222,11 @@ async def Verifica_ID():
         #  & 
         (Firmware.SN == None))
     )
-        
     result = session.execute(stmt)
     ids = [row.device_id for row in result.scalars()]
-    if len(ids) == 0:
-        print('Todos os dispositivos estão atualizados')
-        yield
     print(ids)
-    yield ids
+    return ids
+
 
 
 async def sending_bytes(sock, device_id, addr,blocos_de_dados):
@@ -256,6 +253,9 @@ async def main():
         while True:
             try:
                 ids_desatualizados = await Verifica_ID()
+                if len(ids_desatualizados) == 0:
+                    print('Todos os dispositivos estão atualizados')
+                    await asyncio.sleep(10)
                 data, addr = sock.recvfrom(1024)
                 ip_equipamento = addr[0]
                 print(data,ip_equipamento)
