@@ -174,7 +174,7 @@ def enviar_mensagem_udp(sock, addr, mensagem):
     response, _ = sock.recvfrom(1024)
     print(response)
     if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
-        send_ack(sock, addr, response)
+        # send_ack(sock, addr, response)
         raise TryAgain
     if time.time() - start_time >= timeout:
         print("timeout")
@@ -272,10 +272,13 @@ async def main():
         except socket.timeout:
             pass
         except KeyboardInterrupt:
-            print("CRLT + C")
+            print("CRLT + C")            
+        finally:
+            sock.shutdown()
+            sock.close()
             exit()
-        # finally:
             # await Verifica_tabela('teste')
+
         
 
 if __name__ == "__main__":
