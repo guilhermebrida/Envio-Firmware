@@ -7,7 +7,7 @@ import time
 import asyncio
 import selectors
 import time
-from tenacity import retry, stop_after_delay, wait_fixed, stop_after_attempt, TryAgain
+from tenacity import retry, stop_after_delay, wait_fixed, stop_after_attempt, TryAgain, RetryError
 from sqlalchemy import create_engine, Column, String, LargeBinary, DateTime, func, select
 from sqlalchemy.orm import sessionmaker,declarative_base
 from datetime import datetime
@@ -163,7 +163,7 @@ def solicitar_serial_number(sock, device_id, addr):
                 LISTENED.append(device_id)
                 RSN_DICT[device_id] = sn
 
-@retry(stop=stop_after_attempt(5), wait=wait_fixed(2))
+@retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
 def enviar_mensagem_udp(sock, addr, mensagem):
     try:
         timeout = 5
@@ -182,8 +182,9 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             print("timeout")
             raise TryAgain
         return response
-    except Exception as e:
+    except RetryError as e:
         print(type(e))
+        enviar_mensagem_udp(sock, addr, mensagem)
     #     print(e)
     #     pass
 
@@ -226,7 +227,7 @@ async def Verifica_ID():
     ids = [row.device_id for row in result.scalars()]
     if len(ids) == 0:
         print('Todos os dispositivos estão atualizados')
-        await asyncio.sleep(60)
+        await asyncio.sleep(10)
     print(ids)
     return ids
 
