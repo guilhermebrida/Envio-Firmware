@@ -264,17 +264,17 @@ async def main():
                 blocos_de_dados = Arquivos(device_id)
             if device_id in RSN_DICT:
                 blocos_de_dados= await Verifica_tabela(device_id)
-            if blocos_de_dados and ip_equipamento not in equipamentos_executados:
-                # await enviar_bloco(sock, bloco, addr)
-                await sending_bytes(sock, device_id, addr, blocos_de_dados)
-                equipamentos_executados[ip_equipamento] = True
-                print(equipamentos_executados)
+                if ip_equipamento not in equipamentos_executados:
+                    # await enviar_bloco(sock, bloco, addr)
+                    await sending_bytes(sock, device_id, addr, blocos_de_dados)
+                    equipamentos_executados[ip_equipamento] = True
+                    print(equipamentos_executados)
         except socket.timeout:
             pass
         except KeyboardInterrupt:
             print("CRLT + C")            
         finally:
-            sock.shutdown()
+            sock.shutdown(socket.SHUT_RDWR)
             sock.close()
             exit()
             # await Verifica_tabela('teste')
