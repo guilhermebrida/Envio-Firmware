@@ -149,10 +149,10 @@ def find(pasta):
     # await receber_resposta(sock)
     
 
-async def solicitar_serial_number(sock, device_id, addr):
+def solicitar_serial_number(sock, device_id, addr):
     xvm = XVM.generateXVM(device_id, str(8000).zfill(4), '>QSN<')
     print(xvm)
-    response = await enviar_mensagem_udp(sock,addr,xvm)
+    response = enviar_mensagem_udp(sock,addr,xvm)
     result = re.search('>RSN.*', response.decode())
     if result is not None:
         rsn = result.group()
@@ -163,7 +163,7 @@ async def solicitar_serial_number(sock, device_id, addr):
             RSN_DICT[device_id] = sn
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(2))
-async def enviar_mensagem_udp(sock, addr, mensagem):
+def enviar_mensagem_udp(sock, addr, mensagem):
     timeout = 5
     if isinstance(mensagem, bytes):
         sock.sendto(mensagem, addr)
@@ -174,14 +174,14 @@ async def enviar_mensagem_udp(sock, addr, mensagem):
     response, _ = sock.recvfrom(1024)
     print(response)
     if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
-        await send_ack(sock, addr, response)
+        send_ack(sock, addr, response)
         raise TryAgain
     if time.time() - start_time >= timeout:
         print("timeout")
         raise TryAgain
     return response
 
-async def send_ack(sock, addr, message):
+def send_ack(sock, addr, message):
     if re.search(b'BINA.*',message) is None:
         xvmMessage = XVM.parseXVM(message.decode(errors='ignore'))
         device_id = xvmMessage[1]
@@ -256,9 +256,9 @@ async def main():
             # if re.search(b'BINA.*',data) is None:
             #     xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
             #     device_id = xvmMessage[1]
-            device_id = await send_ack(sock, addr, data)
+            device_id = send_ack(sock, addr, data)
             if device_id in ids_desatualizados:
-                await solicitar_serial_number(sock, device_id, addr)
+                solicitar_serial_number(sock, device_id, addr)
                     # envioScript(sock, device_id, addr)
                 print(RSN_DICT)
                 blocos_de_dados = Arquivos(device_id)
