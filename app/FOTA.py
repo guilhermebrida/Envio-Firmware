@@ -182,13 +182,8 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             print("timeout")
             raise TryAgain
         return response
-<<<<<<< HEAD
     # except RetryError as e:
         # print(type(e))
-=======
-    except RetryError as e:
-        print(type(e))
->>>>>>> 9e7275a2ad51946390af94ed6468e6948d62f4e0
         # enviar_mensagem_udp(sock, addr, mensagem)
     #     print(e)
     #     pass
