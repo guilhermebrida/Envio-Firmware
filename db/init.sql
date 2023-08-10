@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS public.firmware
     "SN" text COLLATE pg_catalog."default" NULL,
     "content_blocs" bytea,
     "blocs_acks" bytea,
-    inserted_datetime timestamp with time zone DEFAULT timezone('America/Sao_Paulo'),
-    send_datetime timestamp with time zone DEFAULT timezone('America/Sao_Paulo'),
-    reception_datetime timestamp with time zone DEFAULT timezone('America/Sao_Paulo')
+    inserted_datetime timestamp with time zone,
+    send_datetime timestamp with time zone,
+    reception_datetime timestamp with time zone
     );
