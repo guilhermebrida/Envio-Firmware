@@ -184,8 +184,8 @@ def enviar_mensagem_udp(sock, addr, mensagem):
         return response
     except Exception as e:
         print(type(e))
-        print(e)
-        pass
+    #     print(e)
+    #     pass
 
 def send_ack(sock, addr, message):
     if re.search(b'BINA.*',message) is None:
