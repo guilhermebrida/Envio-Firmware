@@ -26,11 +26,11 @@ arquivos = None
 BLOCOS = []
 LISTENED = []
 
-# postgres_host = os.environ['POSTGRES_HOST']
-# postgres_port = os.environ['POSTGRES_PORT']
-# postgres_user = os.environ['POSTGRES_USER']
-# postgres_password = os.environ['POSTGRES_PASSWORD']
-# postgres_db = os.environ['POSTGRES_DB']
+postgres_host = os.environ['POSTGRES_HOST']
+postgres_port = os.environ['POSTGRES_PORT']
+postgres_user = os.environ['POSTGRES_USER']
+postgres_password = os.environ['POSTGRES_PASSWORD']
+postgres_db = os.environ['POSTGRES_DB']
 
 # connection = psycopg2.connect(
 #     host=postgres_host,
@@ -54,8 +54,8 @@ blocos_de_dados = [...]
 
 
 
-engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
-# engine = create_engine(f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}')
+# engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
+engine = create_engine(f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}')
 Base = declarative_base()
 
 class Firmware(Base):
