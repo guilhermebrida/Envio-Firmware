@@ -236,7 +236,7 @@ async def sending_bytes(sock, device_id, addr,blocos_de_dados):
             {"send_datetime": datetime.now()}
         )
         session.commit()
-        res = await enviar_mensagem_udp(sock, addr, bloco)
+        res = enviar_mensagem_udp(sock, addr, bloco)
         if res:
             session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
             {"blocs_acks":res,"reception_datetime": datetime.now()}
