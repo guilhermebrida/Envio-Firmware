@@ -245,38 +245,39 @@ async def main():
     sock.settimeout(5)
     # sock.setblocking(False)
     print((host, porta))
-    while True:
-        try:
-            ids_desatualizados = await Verifica_ID()
-            data, addr = sock.recvfrom(1024)
-            ip_equipamento = addr[0]
-            print(data,ip_equipamento)
-            print('Mensagem recebida:', data)
-            # if ip_equipamento not in equipamentos_executados:
-            # if re.search(b'BINA.*',data) is None:
-            #     xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
-            #     device_id = xvmMessage[1]
-            device_id = send_ack(sock, addr, data)
-            if device_id in ids_desatualizados:
-                solicitar_serial_number(sock, device_id, addr)
-                    # envioScript(sock, device_id, addr)
-                print(RSN_DICT)
-                blocos_de_dados = Arquivos(device_id)
-            if device_id in RSN_DICT:
-                blocos_de_dados= await Verifica_tabela(device_id)
-                if ip_equipamento not in equipamentos_executados:
-                    # await enviar_bloco(sock, bloco, addr)
-                    await sending_bytes(sock, device_id, addr, blocos_de_dados)
-                    equipamentos_executados[ip_equipamento] = True
-                    print(equipamentos_executados)
-        except socket.timeout:
-            pass
-        except KeyboardInterrupt:
-            print("CRLT + C")            
-        finally:
-            sock.shutdown(socket.SHUT_RDWR)
-            sock.close()
-            exit()
+    try :
+        while True:
+            try:
+                ids_desatualizados = await Verifica_ID()
+                data, addr = sock.recvfrom(1024)
+                ip_equipamento = addr[0]
+                print(data,ip_equipamento)
+                print('Mensagem recebida:', data)
+                # if ip_equipamento not in equipamentos_executados:
+                # if re.search(b'BINA.*',data) is None:
+                #     xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
+                #     device_id = xvmMessage[1]
+                device_id = send_ack(sock, addr, data)
+                if device_id in ids_desatualizados:
+                    solicitar_serial_number(sock, device_id, addr)
+                        # envioScript(sock, device_id, addr)
+                    print(RSN_DICT)
+                    blocos_de_dados = Arquivos(device_id)
+                if device_id in RSN_DICT:
+                    blocos_de_dados= await Verifica_tabela(device_id)
+                    if ip_equipamento not in equipamentos_executados:
+                        # await enviar_bloco(sock, bloco, addr)
+                        await sending_bytes(sock, device_id, addr, blocos_de_dados)
+                        equipamentos_executados[ip_equipamento] = True
+                        print(equipamentos_executados)
+            except socket.timeout:
+                pass
+            except KeyboardInterrupt:
+                print("CRLT + C")            
+    finally:
+        sock.shutdown(socket.SHUT_RDWR)
+        sock.close()
+        exit()
             # await Verifica_tabela('teste')
 
         
