@@ -163,7 +163,7 @@ def solicitar_serial_number(sock, device_id, addr):
             RSN_DICT[device_id] = sn
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(2))
-def enviar_mensagem_udp(sock, addr, mensagem):
+async def enviar_mensagem_udp(sock, addr, mensagem):
     timeout = 5
     if isinstance(mensagem, bytes):
         sock.sendto(mensagem, addr)
@@ -174,13 +174,22 @@ def enviar_mensagem_udp(sock, addr, mensagem):
     response, _ = sock.recvfrom(1024)
     print(response)
     if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
+        await send_ack(sock, addr, response)
         raise TryAgain
     if time.time() - start_time >= timeout:
         print("timeout")
         raise TryAgain
     return response
 
-
+async def send_ack(sock, addr, message):
+    if re.search(b'BINA.*',message) is None:
+        xvmMessage = XVM.parseXVM(message.decode(errors='ignore'))
+        device_id = xvmMessage[1]
+        sequence = xvmMessage[2]
+        ack = XVM.generateAck(device_id,sequence)
+        sock.sendto(ack, addr)
+        print('ack enviado')
+        return device_id
 
 async def Verifica_tabela(device_id):
     blocos = []
@@ -222,7 +231,7 @@ async def sending_bytes(sock, device_id, addr,blocos_de_dados):
             {"send_datetime": datetime.now()}
         )
         session.commit()
-        res = enviar_mensagem_udp(sock, addr, bloco)
+        res = await enviar_mensagem_udp(sock, addr, bloco)
         if res:
             session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
             {"blocs_acks":res,"reception_datetime": datetime.now()}
@@ -244,10 +253,10 @@ async def main():
             print(data,ip_equipamento)
             print('Mensagem recebida:', data)
             # if ip_equipamento not in equipamentos_executados:
-            if re.search(b'BINA.*',data) is None:
-                xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
-                msg = xvmMessage[0]
-                device_id = xvmMessage[1]
+            # if re.search(b'BINA.*',data) is None:
+            #     xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
+            #     device_id = xvmMessage[1]
+            device_id = await send_ack(sock, addr, data)
             if device_id in ids_desatualizados:
                 solicitar_serial_number(sock, device_id, addr)
                     # envioScript(sock, device_id, addr)
