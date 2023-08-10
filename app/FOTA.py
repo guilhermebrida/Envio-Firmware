@@ -247,7 +247,7 @@ async def sending_bytes(sock, device_id, addr,blocos_de_dados):
 async def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((host, porta))
-    sock.settimeout(5)
+    sock.settimeout(60)
     # sock.setblocking(False)
     print((host, porta))
     try :
