@@ -226,7 +226,6 @@ async def Verifica_ID():
     ids = [row.device_id for row in result.scalars()]
     if len(ids) == 0:
         print('Todos os dispositivos estão atualizados')
-        await asyncio.sleep(1)
     print(ids)
     return ids
 
@@ -277,7 +276,6 @@ async def main():
                         await sending_bytes(sock, device_id, addr, blocos_de_dados)
                         equipamentos_executados[ip_equipamento] = True
                         print(equipamentos_executados)
-                await asyncio.sleep(10)
             except socket.timeout:
                 pass
             except KeyboardInterrupt:
