@@ -187,7 +187,7 @@ async def send_ack(sock, addr, message):
         device_id = xvmMessage[1]
         sequence = xvmMessage[2]
         ack = XVM.generateAck(device_id,sequence)
-        sock.sendto(ack, addr)
+        sock.sendto(ack.encode(), addr)
         print('ack enviado')
         return device_id
 
