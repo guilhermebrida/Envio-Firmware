@@ -227,6 +227,7 @@ async def sending_bytes(sock, device_id, addr,blocos_de_dados):
             session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
             {"blocs_acks":res,"reception_datetime": datetime.now()}
             )
+        await asyncio.sleep(0.3)
     
 
 async def main():
