@@ -26,11 +26,11 @@ arquivos = None
 BLOCOS = []
 LISTENED = []
 
-postgres_host = os.environ['POSTGRES_HOST']
-postgres_port = os.environ['POSTGRES_PORT']
-postgres_user = os.environ['POSTGRES_USER']
-postgres_password = os.environ['POSTGRES_PASSWORD']
-postgres_db = os.environ['POSTGRES_DB']
+# postgres_host = os.environ['POSTGRES_HOST']
+# postgres_port = os.environ['POSTGRES_PORT']
+# postgres_user = os.environ['POSTGRES_USER']
+# postgres_password = os.environ['POSTGRES_PASSWORD']
+# postgres_db = os.environ['POSTGRES_DB']
 
 # connection = psycopg2.connect(
 #     host=postgres_host,
@@ -54,35 +54,37 @@ blocos_de_dados = [...]
 
 
 
-# engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
-engine = create_engine(f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}')
+engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
+# engine = create_engine(f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}')
 Base = declarative_base()
 
 class Firmware(Base):
     __tablename__ = 'firmware'
 
     device_id = Column(String, primary_key=True)
-    SN = Column(String, nullable=False)
+    SN = Column(String, default=None)
     content_blocs = Column(LargeBinary)
     blocs_acks = Column(LargeBinary)
+    inserted_datetime = Column(DateTime, default=None)
     send_datetime = Column(DateTime, default=None)
     reception_datetime = Column(DateTime, default=None)
 
     def __repr__(self):
-        return f"Firmware(device_id={self.device_id}, SN={self.SN}, ...)"
+        return f"Firmware(device_id={self.device_id}, SN={self.SN}, blocs_content={self.content_blocs})"
 
 
-Session = sessionmaker(bind=engine)
+
+Session = sessionmaker(bind=engine, autoflush=True )
 session = Session()
 
-novo_firmware = Firmware(
-    device_id='id_do_dispositivo',
-    SN='numero_de_serie',
-    content_blocs=b'conteudo_blocos', 
-    blocs_acks=b'acks_dos_blocos',    
-    send_datetime=datetime.now(),
-    reception_datetime=datetime.now()
-)
+# novo_firmware = Firmware(
+#     device_id='id_do_dispositivo',
+#     SN='numero_de_serie',
+#     content_blocs=b'conteudo_blocos', 
+#     blocs_acks=b'acks_dos_blocos',    
+#     send_datetime=datetime.now(),
+#     reception_datetime=datetime.now()
+# )
 
 # session.add(novo_firmware)
 # session.commit()
@@ -93,25 +95,31 @@ def Arquivos(device_id):
         sn = RSN_DICT[device_id]
         # print(path_voz)
         for files in path_fw:
-            f=open(f'{files}','rb')
-            conteudo = f.read()
-            separar = [conteudo[i:i+520]for i in range(0,len(conteudo),520)]
-            print('\n',files,'\n')
-            msg = '80000000'
-            for i in range(len(separar)):
-                bloco = cabeçalho.encode().hex()+separar[i].hex()+sn.encode().hex()
-                sep = re.findall('........',bloco)
-                sep.append(msg)
-                cs =  crc(sep)
-                bloc = bloco+msg+cs
-                msg = int(msg,16)+1
-                msg = format(msg,'X')
-                b = bytes.fromhex(bloc)
-                BLOCOS.append(b)
-                fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=b,send_datetime=datetime.now())
-                session.add(fw)
-                session.commit()
+            with open(files, 'rb') as f:
+                conteudo = f.read()
+                separar = [conteudo[i:i+520]for i in range(0,len(conteudo),520)]
+                print('\n',files,'\n')
+                msg = '80000000'
+                for i in range(len(separar)):
+                    bloco = cabeçalho.encode().hex()+separar[i].hex()+sn.encode().hex()
+                    sep = re.findall('........',bloco)
+                    sep.append(msg)
+                    cs =  crc(sep)
+                    bloc = bloco+msg+cs
+                    msg = int(msg,16)+1
+                    msg = format(msg,'X')
+                    b = bytes.fromhex(bloc)
+                    BLOCOS.append(b)
+                    if i == 0:
+                        session.query(Firmware).filter_by(device_id=device_id).update(
+                            {"SN": sn , "content_blocs": b, "inserted_datetime": datetime.now()}
+                            )
+                    else:
+                        fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=b, inserted_datetime=datetime.now())
+                        session.add(fw)
+                    session.commit()
         print('return')
+        # print(BLOCOS)
         return BLOCOS
 
 
@@ -156,8 +164,8 @@ def solicitar_serial_number(sock, device_id, addr):
 
 @retry(stop=stop_after_attempt(30), wait=wait_fixed(2))
 def enviar_mensagem_udp(sock, addr, mensagem):
-    timeout = 3
-    if type(mensagem) == bytes:
+    timeout = 5
+    if isinstance(mensagem, bytes):
         sock.sendto(mensagem, addr)
     else:
         print(mensagem)
@@ -173,71 +181,92 @@ def enviar_mensagem_udp(sock, addr, mensagem):
     return response
 
 
-# async def receber_resposta(sock):
-#     timeout = 5
-#     start_time = time.time()
-#     response, _ = sock.recvfrom(1024)
-#     if time.time() - start_time >= timeout:
-#         return False
-#     print('Resposta:', response)
-
-
-
-# def criar(device_id,vozes):
-#     try:
-#         sn = RSN_DICT[device_id]
-#         cursor.execute('INSERT INTO vozes ("IMEI", "SN", "VOZES") values (\'{}\', \'{}\', \'{}\');'.format(device_id, sn,vozes))
-#         connection.commit()
-#     except:
-#         pass
-#     finally:
-#         cursor.execute('SELECT "IMEI" FROM vozes;')
-#         results = cursor.fetchall()
-#         ID = [result[0] for result in results]
-#         print('Ids no banco:',ID)
 
 async def Verifica_tabela(device_id):
-    select = select([Firmware.blocs_acks]).where(Firmware.device_id == device_id 
-    and Firmware.blocs_acks == None).order_by(Firmware.send_datetime.asc())
-    result = await session.execute(select)
-    print(result)
+    blocos = []
+    stmt = (
+        select(Firmware.content_blocs)
+        .where(
+        # (Firmware.device_id == device_id)&
+        (Firmware.blocs_acks == None))
+    )
+    
+    result = session.execute(stmt)
+    
+    for row in result.scalars():
+        blocos.append(row)
+    # print(blocos)
+    return blocos
 
+async def Verifica_ID():
+    stmt = (
+        select(Firmware)
+        .where(
+        # (Firmware.device_id is not None)
+        #  & 
+        (Firmware.SN == None))
+    )
+        
+    result = session.execute(stmt)
+    ids = [row.device_id for row in result.scalars()]
+    if len(ids) == 0:
+        print('Todos os dispositivos estão atualizados')
+        await asyncio.sleep(60)
+    print(ids)
+    return ids
+
+
+async def sending_bytes(sock, device_id, addr,blocos_de_dados):
+    for bloco in blocos_de_dados:
+        session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
+            {"send_datetime": datetime.now()}
+        )
+        session.commit()
+        res = enviar_mensagem_udp(sock, addr, bloco)
+        if res:
+            session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
+            {"reception_datetime": datetime.now()}
+            )
+    
 
 async def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((host, porta))
+    sock.settimeout(5)
     # sock.setblocking(False)
     print((host, porta))
     while True:
-        data, addr = sock.recvfrom(1024)
-        ip_equipamento = addr[0]
-        print(data,ip_equipamento)
-        # if ip_equipamento not in equipamentos_executados:
-        if re.search(b'BINA.*',data) is None:
-            xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
-            msg = xvmMessage[0]
-            device_id = xvmMessage[1]
-        if device_id not in RSN_DICT:
-            solicitar_serial_number(sock, device_id, addr)
-                # envioScript(sock, device_id, addr)
-            print(RSN_DICT)
-            blocos_de_dados = Arquivos(device_id)
-        if device_id in RSN_DICT:
-            Verifica_tabela(device_id)
-        if ip_equipamento not in equipamentos_executados:
-            # for bloco in blocos_de_dados:
-            #         # await enviar_bloco(sock, bloco, addr)
-            #     fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=bloco,send_datetime=datetime.now())
-            #     session.add(fw)
-            #     session.commit()
-            #     enviar_mensagem_udp(sock, addr, bloco, device_id)
-            equipamentos_executados[ip_equipamento] = True
-            print(equipamentos_executados)
-
-            # equipamentos_executados[ip_equipamento] = True
-        print('Mensagem recebida:', data)
-
-
+        try:
+            ids_desatualizados = await Verifica_ID()
+            data, addr = sock.recvfrom(1024)
+            ip_equipamento = addr[0]
+            print(data,ip_equipamento)
+            print('Mensagem recebida:', data)
+            # if ip_equipamento not in equipamentos_executados:
+            if re.search(b'BINA.*',data) is None:
+                xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
+                msg = xvmMessage[0]
+                device_id = xvmMessage[1]
+            if device_id in ids_desatualizados:
+                solicitar_serial_number(sock, device_id, addr)
+                    # envioScript(sock, device_id, addr)
+                print(RSN_DICT)
+                blocos_de_dados = Arquivos(device_id)
+            if device_id in RSN_DICT:
+                blocos_de_dados= await Verifica_tabela(device_id)
+            if ip_equipamento not in equipamentos_executados:
+                # await enviar_bloco(sock, bloco, addr)
+                await sending_bytes(sock, device_id, addr, blocos_de_dados)
+                equipamentos_executados[ip_equipamento] = True
+                print(equipamentos_executados)
+        except socket.timeout:
+            pass
+        except KeyboardInterrupt:
+            print("CRLT + C")
+            exit()
+        # finally:
+            # await Verifica_tabela('teste')
+        
 
 if __name__ == "__main__":
     try:
@@ -249,10 +278,12 @@ if __name__ == "__main__":
         # path_script = find(pasta_scripts)
         # print("Script basico:",path_script)
         # if path_voz:
+        fw = Firmware()
         asyncio.run(main())
             # servidor_udp()
     except KeyboardInterrupt:
-        pass
+        print("Finalizando")
+        exit()
 
 
 
