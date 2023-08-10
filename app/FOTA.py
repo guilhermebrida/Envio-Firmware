@@ -226,7 +226,7 @@ async def Verifica_ID():
     ids = [row.device_id for row in result.scalars()]
     if len(ids) == 0:
         print('Todos os dispositivos estão atualizados')
-        await asyncio.sleep(10)
+        await asyncio.sleep(1)
     print(ids)
     return ids
 
@@ -247,15 +247,15 @@ async def sending_bytes(sock, device_id, addr,blocos_de_dados):
     
 
 async def main():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind((host, porta))
+    sock.settimeout(60)
+    # sock.setblocking(False)
+    print((host, porta))
     try :
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.bind((host, porta))
-        sock.settimeout(60)
-        # sock.setblocking(False)
-        print((host, porta))
         while True:
             try:
-                ids_desatualizados = asyncio.create_task(Verifica_ID())
+                ids_desatualizados = await Verifica_ID()
                 data, addr = sock.recvfrom(1024)
                 ip_equipamento = addr[0]
                 print(data,ip_equipamento)
@@ -277,6 +277,7 @@ async def main():
                         await sending_bytes(sock, device_id, addr, blocos_de_dados)
                         equipamentos_executados[ip_equipamento] = True
                         print(equipamentos_executados)
+                await asyncio.sleep(10)
             except socket.timeout:
                 pass
             except KeyboardInterrupt:
@@ -287,14 +288,24 @@ async def main():
         exit()
             # await Verifica_tabela('teste')
 
-        
+async def run():
+    task1 = asyncio.create_task(main())
+
+    await task1
 
 if __name__ == "__main__":
     try:
+        # pasta_vozes = "./app/Files/Vozes/"
         pasta_fw = "./app/Files/"
         path_fw = find(pasta_fw)
+        # print("Arquivos de Voz:",path_voz)
+        # path = []
+        # path_script = find(pasta_scripts)
+        # print("Script basico:",path_script)
+        # if path_voz:
         fw = Firmware()
-        asyncio.run(main())
+        asyncio.run(run())
+            # servidor_udp()
     except KeyboardInterrupt:
         print("Finalizando")
         exit()
