@@ -168,6 +168,7 @@ def enviar_mensagem_udp(sock, addr, mensagem):
     try:
         timeout = 5
         if isinstance(mensagem, bytes):
+            print(mensagem)
             sock.sendto(mensagem, addr)
         else:
             print(mensagem)
@@ -184,7 +185,7 @@ def enviar_mensagem_udp(sock, addr, mensagem):
         return response
     except RetryError as e:
         print(type(e))
-        enviar_mensagem_udp(sock, addr, mensagem)
+        # enviar_mensagem_udp(sock, addr, mensagem)
     #     print(e)
     #     pass
 
@@ -194,8 +195,8 @@ def send_ack(sock, addr, message):
         device_id = xvmMessage[1]
         sequence = xvmMessage[2]
         ack = XVM.generateAck(device_id,sequence)
+        print(ack)
         sock.sendto(ack.encode(), addr)
-        print('ack enviado')
         return device_id
 
 async def Verifica_tabela(device_id):
