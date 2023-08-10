@@ -181,7 +181,8 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             print("timeout")
             raise TryAgain
         return response
-    except tenacity.RetryError as e:
+    except Exception as e:
+        print(type(e))
         print(e)
         pass
 
