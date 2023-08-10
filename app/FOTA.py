@@ -162,7 +162,7 @@ def solicitar_serial_number(sock, device_id, addr):
             LISTENED.append(device_id)
             RSN_DICT[device_id] = sn
 
-@retry(stop=stop_after_attempt(30), wait=wait_fixed(2))
+@retry(stop=stop_after_attempt(5), wait=wait_fixed(2))
 def enviar_mensagem_udp(sock, addr, mensagem):
     timeout = 5
     if isinstance(mensagem, bytes):
@@ -225,7 +225,7 @@ async def sending_bytes(sock, device_id, addr,blocos_de_dados):
         res = enviar_mensagem_udp(sock, addr, bloco)
         if res:
             session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
-            {"reception_datetime": datetime.now()}
+            {"blocs_acks":res,"reception_datetime": datetime.now()}
             )
     
 
