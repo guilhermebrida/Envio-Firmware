@@ -258,7 +258,7 @@ async def main():
             #     device_id = xvmMessage[1]
             device_id = await send_ack(sock, addr, data)
             if device_id in ids_desatualizados:
-                solicitar_serial_number(sock, device_id, addr)
+                await solicitar_serial_number(sock, device_id, addr)
                     # envioScript(sock, device_id, addr)
                 print(RSN_DICT)
                 blocos_de_dados = Arquivos(device_id)
