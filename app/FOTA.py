@@ -153,21 +153,21 @@ def solicitar_serial_number(sock, device_id, addr):
     xvm = XVM.generateXVM(device_id, str(8000).zfill(4), '>QSN<')
     print(xvm)
     response = enviar_mensagem_udp(sock,addr,xvm)
-    if response is not None:
-        result = re.search('>RSN.*', response.decode())
-        if result is not None:
-            rsn = result.group()
-            sn = rsn.split('_')[0].split('>RSN')[1]
-            if sn:
-                print(sn)
-                LISTENED.append(device_id)
-                RSN_DICT[device_id] = sn
+    result = re.search('>RSN.*', response.decode())
+    if result is not None:
+        rsn = result.group()
+        sn = rsn.split('_')[0].split('>RSN')[1]
+        if sn:
+            print(sn)
+            LISTENED.append(device_id)
+            RSN_DICT[device_id] = sn
 
 @retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
 def enviar_mensagem_udp(sock, addr, mensagem):
-    try:
+    # try:
         timeout = 5
         if isinstance(mensagem, bytes):
+            print(mensagem)
             sock.sendto(mensagem, addr)
         else:
             print(mensagem)
@@ -182,9 +182,9 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             print("timeout")
             raise TryAgain
         return response
-    except RetryError as e:
-        print(type(e))
-        enviar_mensagem_udp(sock, addr, mensagem)
+    # except RetryError as e:
+        # print(type(e))
+        # enviar_mensagem_udp(sock, addr, mensagem)
     #     print(e)
     #     pass
 
@@ -194,8 +194,8 @@ def send_ack(sock, addr, message):
         device_id = xvmMessage[1]
         sequence = xvmMessage[2]
         ack = XVM.generateAck(device_id,sequence)
+        print(ack)
         sock.sendto(ack.encode(), addr)
-        print('ack enviado')
         return device_id
 
 async def Verifica_tabela(device_id):
@@ -227,9 +227,9 @@ async def Verifica_ID():
     ids = [row.device_id for row in result.scalars()]
     if len(ids) == 0:
         print('Todos os dispositivos estão atualizados')
-        await asyncio.sleep(10)
+        yield
     print(ids)
-    return ids
+    yield ids
 
 
 async def sending_bytes(sock, device_id, addr,blocos_de_dados):
