@@ -272,6 +272,8 @@ async def main():
             #     xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
             #     device_id = xvmMessage[1]
             device_id = send_ack(sock, addr, data)
+            print(device_id, ids_desatualizados)
+            print(device_id in ids_desatualizados)
             if device_id in ids_desatualizados:
                 solicitar_serial_number(sock, device_id, addr)
                     # envioScript(sock, device_id, addr)
