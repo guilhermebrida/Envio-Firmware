@@ -11,7 +11,9 @@ from tenacity import retry, stop_after_delay, wait_fixed, stop_after_attempt, Tr
 from sqlalchemy import create_engine, Column, String, LargeBinary, DateTime, func, select
 from sqlalchemy.orm import sessionmaker,declarative_base
 from datetime import datetime
-from threading import Thread
+from threading import Thread, Lock
+import threading
+
 
 ips = []
 ALREADY_LISTEN = []
@@ -214,7 +216,7 @@ def Verifica_ID():
     return ids
 
 
-def periodic_query(ids_desatualizados:list):
+def periodic_query(ids_desatualizados:list, lock):
     while True:
         ids = Verifica_ID()
         if ids not in ids_desatualizados:
@@ -241,6 +243,10 @@ def sending_bytes(device_id, addr,blocos_de_dados):
 async def main():
     # sock.setblocking(False)
     print((host, porta))
+    ids_desatualizados = []
+    lock = threading.Lock()
+    thread = Thread(target=periodic_query, args=(ids_desatualizados,lock))
+    thread.start()
     try :
         while True:
             # ids_desatualizados = await Verifica_ID()
@@ -252,8 +258,9 @@ async def main():
             #     xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
             #     device_id = xvmMessage[1]
             device_id = send_ack(sock, addr, data)
-            print(device_id, ids_desatualizados[0])
-            print(device_id in ids_desatualizados[0])
+            with lock:
+                print(device_id, ids_desatualizados[0])
+                print(device_id in ids_desatualizados[0])
             if device_id in ids_desatualizados[0]:
                 solicitar_serial_number(sock, device_id, addr)
                     # envioScript(sock, device_id, addr)
@@ -281,9 +288,6 @@ if __name__ == "__main__":
         # sock.settimeout(60)
         pasta_fw = "./app/Files/"
         path_fw = find(pasta_fw)
-        ids_desatualizados = []
-        thread = Thread(target=periodic_query, args=(ids_desatualizados,))
-        thread.start()
         fw = Firmware()
         asyncio.run(main())
             # servidor_udp()
