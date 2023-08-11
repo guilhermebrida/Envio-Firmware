@@ -210,10 +210,12 @@ def Verifica_ID():
     )
     result = session.execute(stmt)
     ids = [row.device_id for row in result.scalars()]
-    if len(ids) == 0:
-        print('Todos os dispositivos estão atualizados')
-    print(ids)
-    return ids
+    if ids is not None or ids is not []:
+        print(ids)
+        return ids
+    print('Todos os dispositivos estão atualizados')
+    
+
 
 
 def periodic_query(ids_desatualizados:list, lock):
