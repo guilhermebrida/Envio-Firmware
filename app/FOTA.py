@@ -215,7 +215,7 @@ async def Verifica_tabela(device_id):
     # print(blocos)
     return blocos
 
-def Verifica_ID(ids_desatualizados):
+def Verifica_ID():
     stmt = (
         select(Firmware)
         .where(
@@ -224,16 +224,18 @@ def Verifica_ID(ids_desatualizados):
         (Firmware.SN == None))
     )
     result = session.execute(stmt)
-    ids_desatualizados = [row.device_id for row in result.scalars()]
-    if len(ids_desatualizados) == 0:
+    ids = [row.device_id for row in result.scalars()]
+    if len(ids) == 0:
         print('Todos os dispositivos estão atualizados')
-    print(ids_desatualizados)
-    return ids_desatualizados
+    print(ids)
+    return ids
 
 
 def periodic_query(ids_desatualizados:list):
     while True:
-        ids_desatualizados = Verifica_ID(ids_desatualizados)
+        ids = Verifica_ID()
+        if ids not in ids_desatualizados:
+            ids_desatualizados.append(ids)
         time.sleep(10)
 
 
