@@ -240,7 +240,7 @@ def periodic_query(ids_desatualizados:list):
 
 
 
-async def sending_bytes(device_id, addr,blocos_de_dados):
+def sending_bytes(device_id, addr,blocos_de_dados):
     for bloco in blocos_de_dados:
         session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
             {"send_datetime": datetime.now()}
@@ -251,7 +251,7 @@ async def sending_bytes(device_id, addr,blocos_de_dados):
             session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
             {"blocs_acks":res,"reception_datetime": datetime.now()}
             )
-        await asyncio.sleep(0.3)
+        time.sleep(0.3)
     
 
 async def main():
@@ -284,6 +284,7 @@ async def main():
                     # await enviar_bloco(sock, bloco, addr)
                     thread2 = Thread(target=sending_bytes, args=(device_id, addr, blocos_de_dados))
                     thread2.start()
+                    thread2.join()
                     # await sending_bytes(sock, device_id, addr, blocos_de_dados)
                     equipamentos_executados[ip_equipamento] = True
                     print(equipamentos_executados)
