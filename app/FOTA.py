@@ -255,9 +255,7 @@ async def sending_bytes(sock, device_id, addr,blocos_de_dados):
     
 
 async def main():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind((host, porta))
-    sock.settimeout(60)
+
     # sock.setblocking(False)
     print((host, porta))
     ids_desatualizados = []
@@ -287,19 +285,16 @@ async def main():
                     await sending_bytes(sock, device_id, addr, blocos_de_dados)
                     equipamentos_executados[ip_equipamento] = True
                     print(equipamentos_executados)
-    except socket.timeout:
-        pass
     except KeyboardInterrupt:
         print("CRLT + C")            
-    finally:
-        sock.shutdown(socket.SHUT_RDWR)
-        sock.close()
-        exit()
             # await Verifica_tabela('teste')
 
 
 if __name__ == "__main__":
     try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind((host, porta))
+        sock.settimeout(60)
         # pasta_vozes = "./app/Files/Vozes/"
         pasta_fw = "./app/Files/"
         path_fw = find(pasta_fw)
@@ -313,6 +308,11 @@ if __name__ == "__main__":
             # servidor_udp()
     except KeyboardInterrupt:
         print("Finalizando")
+    except socket.timeout:
+        pass
+    finally:
+        sock.shutdown(socket.SHUT_RDWR)
+        sock.close()
         exit()
 
 
