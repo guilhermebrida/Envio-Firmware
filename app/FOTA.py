@@ -235,7 +235,7 @@ def periodic_query(ids_desatualizados:list):
     while True:
         ids = Verifica_ID()
         if ids not in ids_desatualizados:
-            ids_desatualizados.append([i for i in ids])
+            ids_desatualizados.append(ids)
         time.sleep(10)
 
 
@@ -271,9 +271,9 @@ async def main():
             #     xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
             #     device_id = xvmMessage[1]
             device_id = send_ack(sock, addr, data)
-            print(device_id, ids_desatualizados)
-            print(device_id in ids_desatualizados)
-            if device_id in ids_desatualizados:
+            print(device_id, ids_desatualizados[0])
+            print(device_id in ids_desatualizados[0])
+            if device_id in ids_desatualizados[0]:
                 solicitar_serial_number(sock, device_id, addr)
                     # envioScript(sock, device_id, addr)
                 print(RSN_DICT)
