@@ -216,21 +216,27 @@ async def Verifica_tabela(device_id):
     return blocos
 
 def Verifica_ID():
+    stmt = (
+        select(Firmware)
+        .where(
+        # (Firmware.device_id is not None)
+        #  & 
+        (Firmware.SN == None))
+    )
+    result = session.execute(stmt)
+    ids = [row.device_id for row in result.scalars()]
+    if len(ids) == 0:
+        print('Todos os dispositivos estão atualizados')
+    print(ids)
+    return ids
+
+
+def periodic_query(ids_desatualizados:list):
     while True:
-        stmt = (
-            select(Firmware)
-            .where(
-            # (Firmware.device_id is not None)
-            #  & 
-            (Firmware.SN == None))
-        )
-        result = session.execute(stmt)
-        ids = [row.device_id for row in result.scalars()]
-        if len(ids) == 0:
-            print('Todos os dispositivos estão atualizados')
-            time.sleep(10)
-        print(ids)
-        return ids
+        ids = Verifica_ID()
+        if ids:
+            ids_desatualizados.append(ids)
+        time.sleep(10)
 
 
 
@@ -254,11 +260,12 @@ async def main():
     sock.settimeout(60)
     # sock.setblocking(False)
     print((host, porta))
+    ids_desatualizados = []
+    thread = Thread(target=periodic_query, args=(ids_desatualizados,))
+    thread.start()
     try :
         while True:
             # ids_desatualizados = await Verifica_ID()
-            ids_desatualizados = Thread(target=Verifica_ID)
-            ids_desatualizados.start()
             data, addr = sock.recvfrom(1024)
             ip_equipamento = addr[0]
             print(data,ip_equipamento)
@@ -290,10 +297,6 @@ async def main():
         exit()
             # await Verifica_tabela('teste')
 
-# async def run():
-#     task1 = asyncio.create_task(main())
-
-#     await task1
 
 if __name__ == "__main__":
     try:
