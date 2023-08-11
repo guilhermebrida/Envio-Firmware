@@ -267,7 +267,6 @@ async def main():
             data, addr = sock.recvfrom(1024)
             ip_equipamento = addr[0]
             print(data,ip_equipamento)
-            print('Mensagem recebida:', data)
             # if ip_equipamento not in equipamentos_executados:
             # if re.search(b'BINA.*',data) is None:
             #     xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
