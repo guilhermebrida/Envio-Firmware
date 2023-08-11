@@ -219,6 +219,7 @@ def periodic_query(ids_desatualizados:list):
         ids = Verifica_ID()
         if ids not in ids_desatualizados:
             ids_desatualizados.append(ids)
+            print(ids_desatualizados)
         time.sleep(10)
 
 
@@ -240,8 +241,6 @@ def sending_bytes(device_id, addr,blocos_de_dados):
 async def main():
     # sock.setblocking(False)
     print((host, porta))
-    thread = Thread(target=periodic_query, args=(ids_desatualizados,))
-    thread.start()
     try :
         while True:
             # ids_desatualizados = await Verifica_ID()
@@ -282,8 +281,10 @@ if __name__ == "__main__":
         # sock.settimeout(60)
         pasta_fw = "./app/Files/"
         path_fw = find(pasta_fw)
-        fw = Firmware()
         ids_desatualizados = []
+        thread = Thread(target=periodic_query, args=(ids_desatualizados,))
+        thread.start()
+        fw = Firmware()
         asyncio.run(main())
             # servidor_udp()
     except KeyboardInterrupt:
