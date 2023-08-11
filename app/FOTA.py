@@ -258,7 +258,6 @@ def sending_bytes(device_id, addr,blocos_de_dados):
 async def main():
     # sock.setblocking(False)
     print((host, porta))
-    ids_desatualizados = []
     thread = Thread(target=periodic_query, args=(ids_desatualizados,))
     thread.start()
     try :
@@ -308,6 +307,7 @@ if __name__ == "__main__":
         # print("Script basico:",path_script)
         # if path_voz:
         fw = Firmware()
+        ids_desatualizados = []
         asyncio.run(main())
             # servidor_udp()
     except KeyboardInterrupt:
