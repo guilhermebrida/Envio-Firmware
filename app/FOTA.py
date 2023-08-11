@@ -282,10 +282,10 @@ async def main():
                 blocos_de_dados= await Verifica_tabela(device_id)
                 if ip_equipamento not in equipamentos_executados:
                     # await enviar_bloco(sock, bloco, addr)
-                    thread2 = Thread(target=sending_bytes, args=(device_id, addr, blocos_de_dados))
-                    thread2.start()
-                    thread2.join()
-                    # await sending_bytes(sock, device_id, addr, blocos_de_dados)
+                    # thread2 = Thread(target=sending_bytes, args=(device_id, addr, blocos_de_dados))
+                    # thread2.start()
+                    # thread2.join()
+                    sending_bytes(device_id, addr, blocos_de_dados)
                     equipamentos_executados[ip_equipamento] = True
                     print(equipamentos_executados)
     except KeyboardInterrupt:
