@@ -235,7 +235,7 @@ def periodic_query(ids_desatualizados:list):
     while True:
         ids = Verifica_ID()
         if ids not in ids_desatualizados:
-            ids_desatualizados.append(ids)
+            ids_desatualizados.append([i for i in ids])
         time.sleep(10)
 
 
@@ -255,7 +255,6 @@ async def sending_bytes(sock, device_id, addr,blocos_de_dados):
     
 
 async def main():
-
     # sock.setblocking(False)
     print((host, porta))
     ids_desatualizados = []
