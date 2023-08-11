@@ -12,6 +12,7 @@ from sqlalchemy import create_engine, Column, String, LargeBinary, DateTime, fun
 from sqlalchemy.orm import sessionmaker,declarative_base
 from datetime import datetime
 from threading import Thread
+import copy
 
 ips = []
 ALREADY_LISTEN = []
@@ -235,7 +236,7 @@ def periodic_query(ids_desatualizados:list):
     while True:
         ids = Verifica_ID()
         if ids:
-            ids_desatualizados.append(ids)
+            ids_desatualizados = copy.deepcopy(ids)
         time.sleep(10)
 
 
