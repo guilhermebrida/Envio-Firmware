@@ -165,7 +165,7 @@ def solicitar_serial_number(sock, device_id, addr):
 
 @retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
 def enviar_mensagem_udp(sock, addr, mensagem):
-    # try:
+    try:
         timeout = 5
         if isinstance(mensagem, bytes):
             # print(mensagem)
@@ -183,10 +183,11 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             print("timeout")
             raise TryAgain
         return response
-    # except RetryError as e:
-        # print(type(e))
+    except RetryError as e:
+        print("RetryError, COPILOTO SEM COMUNICAÇÃO")
+        print(type(e))
         # enviar_mensagem_udp(sock, addr, mensagem)
-    #     print(e)
+        print(e)
     #     pass
 
 def send_ack(sock, addr, message):
