@@ -168,10 +168,10 @@ def enviar_mensagem_udp(sock, addr, mensagem):
     # try:
         timeout = 5
         if isinstance(mensagem, bytes):
-            print(mensagem)
+            # print(mensagem)
             sock.sendto(mensagem, addr)
         else:
-            print(mensagem)
+            # print(mensagem)
             sock.sendto(mensagem.encode(), addr)
         start_time = time.time()
         response, _ = sock.recvfrom(1024)
@@ -297,7 +297,7 @@ if __name__ == "__main__":
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind((host, porta))
-        sock.settimeout(60)
+        # sock.settimeout(60)
         # pasta_vozes = "./app/Files/Vozes/"
         pasta_fw = "./app/Files/"
         path_fw = find(pasta_fw)
@@ -311,8 +311,8 @@ if __name__ == "__main__":
             # servidor_udp()
     except KeyboardInterrupt:
         print("Finalizando")
-    except socket.timeout:
-        pass
+    # except socket.timeout:
+        # pass
     finally:
         sock.shutdown(socket.SHUT_RDWR)
         sock.close()
