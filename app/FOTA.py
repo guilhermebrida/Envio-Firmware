@@ -78,19 +78,6 @@ class Firmware(Base):
 Session = sessionmaker(bind=engine, autoflush=True )
 session = Session()
 
-# novo_firmware = Firmware(
-#     device_id='id_do_dispositivo',
-#     SN='numero_de_serie',
-#     content_blocs=b'conteudo_blocos', 
-#     blocs_acks=b'acks_dos_blocos',    
-#     send_datetime=datetime.now(),
-#     reception_datetime=datetime.now()
-# )
-
-# session.add(novo_firmware)
-# session.commit()
-
-
 def Arquivos(device_id):
         print(device_id)
         sn = RSN_DICT[device_id]
@@ -144,12 +131,6 @@ def find(pasta):
     return path
 
 
-# async def enviar_bloco(sock, bloco, endereco):
-    # sock.sendto(bloco, endereco)
-    # await asyncio.wait_for(receber_resposta(sock), timeout=3)
-    # await receber_resposta(sock)
-    
-
 def solicitar_serial_number(sock, device_id, addr):
     xvm = XVM.generateXVM(device_id, str(8000).zfill(4), '>QSN<')
     print(xvm)
@@ -188,7 +169,8 @@ def enviar_mensagem_udp(sock, addr, mensagem):
         print(type(e))
         # enviar_mensagem_udp(sock, addr, mensagem)
         print(e)
-    #     pass
+        pass
+
 
 def send_ack(sock, addr, message):
     if re.search(b'BINA.*',message) is None:
@@ -252,7 +234,7 @@ def sending_bytes(device_id, addr,blocos_de_dados):
             session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
             {"blocs_acks":res,"reception_datetime": datetime.now()}
             )
-        time.sleep(0.3)
+        # time.sleep(0.3)
     
 
 async def main():
@@ -298,14 +280,8 @@ if __name__ == "__main__":
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind((host, porta))
         # sock.settimeout(60)
-        # pasta_vozes = "./app/Files/Vozes/"
         pasta_fw = "./app/Files/"
         path_fw = find(pasta_fw)
-        # print("Arquivos de Voz:",path_voz)
-        # path = []
-        # path_script = find(pasta_scripts)
-        # print("Script basico:",path_script)
-        # if path_voz:
         fw = Firmware()
         ids_desatualizados = []
         asyncio.run(main())
