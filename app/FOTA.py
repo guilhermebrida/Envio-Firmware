@@ -11,6 +11,7 @@ from tenacity import retry, stop_after_delay, wait_fixed, stop_after_attempt, Tr
 from sqlalchemy import create_engine, Column, String, LargeBinary, DateTime, func, select
 from sqlalchemy.orm import sessionmaker,declarative_base
 from datetime import datetime
+from threading import Thread
 
 ips = []
 ALREADY_LISTEN = []
@@ -214,20 +215,22 @@ async def Verifica_tabela(device_id):
     # print(blocos)
     return blocos
 
-async def Verifica_ID():
-    stmt = (
-        select(Firmware)
-        .where(
-        # (Firmware.device_id is not None)
-        #  & 
-        (Firmware.SN == None))
-    )
-    result = session.execute(stmt)
-    ids = [row.device_id for row in result.scalars()]
-    if len(ids) == 0:
-        print('Todos os dispositivos estão atualizados')
-    print(ids)
-    return ids
+def Verifica_ID():
+    while True:
+        stmt = (
+            select(Firmware)
+            .where(
+            # (Firmware.device_id is not None)
+            #  & 
+            (Firmware.SN == None))
+        )
+        result = session.execute(stmt)
+        ids = [row.device_id for row in result.scalars()]
+        if len(ids) == 0:
+            print('Todos os dispositivos estão atualizados')
+            time.sleep(10)
+        print(ids)
+        return ids
 
 
 
@@ -253,43 +256,44 @@ async def main():
     print((host, porta))
     try :
         while True:
-            try:
-                ids_desatualizados = await Verifica_ID()
-                data, addr = sock.recvfrom(1024)
-                ip_equipamento = addr[0]
-                print(data,ip_equipamento)
-                print('Mensagem recebida:', data)
-                # if ip_equipamento not in equipamentos_executados:
-                # if re.search(b'BINA.*',data) is None:
-                #     xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
-                #     device_id = xvmMessage[1]
-                device_id = send_ack(sock, addr, data)
-                if device_id in ids_desatualizados:
-                    solicitar_serial_number(sock, device_id, addr)
-                        # envioScript(sock, device_id, addr)
-                    print(RSN_DICT)
-                    blocos_de_dados = Arquivos(device_id)
-                if device_id in RSN_DICT:
-                    blocos_de_dados= await Verifica_tabela(device_id)
-                    if ip_equipamento not in equipamentos_executados:
-                        # await enviar_bloco(sock, bloco, addr)
-                        await sending_bytes(sock, device_id, addr, blocos_de_dados)
-                        equipamentos_executados[ip_equipamento] = True
-                        print(equipamentos_executados)
-            except socket.timeout:
-                pass
-            except KeyboardInterrupt:
-                print("CRLT + C")            
+            # ids_desatualizados = await Verifica_ID()
+            ids_desatualizados = Thread(target=Verifica_ID)
+            ids_desatualizados.start()
+            data, addr = sock.recvfrom(1024)
+            ip_equipamento = addr[0]
+            print(data,ip_equipamento)
+            print('Mensagem recebida:', data)
+            # if ip_equipamento not in equipamentos_executados:
+            # if re.search(b'BINA.*',data) is None:
+            #     xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
+            #     device_id = xvmMessage[1]
+            device_id = send_ack(sock, addr, data)
+            if device_id in ids_desatualizados:
+                solicitar_serial_number(sock, device_id, addr)
+                    # envioScript(sock, device_id, addr)
+                print(RSN_DICT)
+                blocos_de_dados = Arquivos(device_id)
+            if device_id in RSN_DICT:
+                blocos_de_dados= await Verifica_tabela(device_id)
+                if ip_equipamento not in equipamentos_executados:
+                    # await enviar_bloco(sock, bloco, addr)
+                    await sending_bytes(sock, device_id, addr, blocos_de_dados)
+                    equipamentos_executados[ip_equipamento] = True
+                    print(equipamentos_executados)
+    except socket.timeout:
+        pass
+    except KeyboardInterrupt:
+        print("CRLT + C")            
     finally:
         sock.shutdown(socket.SHUT_RDWR)
         sock.close()
         exit()
             # await Verifica_tabela('teste')
 
-async def run():
-    task1 = asyncio.create_task(main())
+# async def run():
+#     task1 = asyncio.create_task(main())
 
-    await task1
+#     await task1
 
 if __name__ == "__main__":
     try:
@@ -302,7 +306,7 @@ if __name__ == "__main__":
         # print("Script basico:",path_script)
         # if path_voz:
         fw = Firmware()
-        asyncio.run(run())
+        asyncio.run(main())
             # servidor_udp()
     except KeyboardInterrupt:
         print("Finalizando")
