@@ -12,7 +12,6 @@ from sqlalchemy import create_engine, Column, String, LargeBinary, DateTime, fun
 from sqlalchemy.orm import sessionmaker,declarative_base
 from datetime import datetime
 from threading import Thread
-import copy
 
 ips = []
 ALREADY_LISTEN = []
@@ -216,7 +215,7 @@ async def Verifica_tabela(device_id):
     # print(blocos)
     return blocos
 
-def Verifica_ID():
+def Verifica_ID(ids_desatualizados):
     stmt = (
         select(Firmware)
         .where(
@@ -225,18 +224,16 @@ def Verifica_ID():
         (Firmware.SN == None))
     )
     result = session.execute(stmt)
-    ids = [row.device_id for row in result.scalars()]
-    if len(ids) == 0:
+    ids_desatualizados = [row.device_id for row in result.scalars()]
+    if len(ids_desatualizados) == 0:
         print('Todos os dispositivos estão atualizados')
-    print(ids)
-    return ids
+    print(ids_desatualizados)
+    return ids_desatualizados
 
 
 def periodic_query(ids_desatualizados:list):
     while True:
-        ids = Verifica_ID()
-        if ids:
-            ids_desatualizados = copy.deepcopy(ids)
+        ids_desatualizados = Verifica_ID(ids_desatualizados)
         time.sleep(10)
 
 
