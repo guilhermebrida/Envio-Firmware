@@ -161,7 +161,7 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             # print(mensagem)
             sock.sendto(mensagem.encode(), addr)
         start_time = time.time()
-        response, _ = sock.recvfrom(1024)
+        response = Thread(target=receber_mensagem_udp, args=()).start()
         print(response)
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             # send_ack(sock, addr, response)
@@ -177,6 +177,10 @@ def enviar_mensagem_udp(sock, addr, mensagem):
         print(e)
         pass
 
+
+def receber_mensagem_udp():
+    response, _ = sock.recvfrom(1024)
+    return response
 
 def send_ack(sock, addr, message):
     if re.search(b'BINA.*',message) is None:
