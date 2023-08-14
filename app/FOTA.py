@@ -163,6 +163,9 @@ def enviar_mensagem_udp(sock, addr, mensagem):
         start_time = time.time()
         response = Thread(target=receber_mensagem_udp, args=()).start()
         print(response)
+        if response is None:
+            time.sleep(2)
+            raise TryAgain
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             # send_ack(sock, addr, response)
             raise TryAgain
