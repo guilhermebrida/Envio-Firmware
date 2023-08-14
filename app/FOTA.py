@@ -14,7 +14,9 @@ from datetime import datetime
 from threading import Thread, Lock
 import threading
 import sys
-# sys.path.append('./app/')
+sys.path.append('./app/')
+diretorio_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), "..")) 
+sys.path.append(diretorio_projeto)
 
 ips = []
 ALREADY_LISTEN = []
