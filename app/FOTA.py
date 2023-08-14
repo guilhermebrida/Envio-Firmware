@@ -169,7 +169,7 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             print("timeout")
             raise TryAgain
         return response
-    except RetryError as e:
+    except tenacity.RetryError as e:
         print("RetryError, COPILOTO SEM COMUNICAÇÃO")
         print(type(e))
         # enviar_mensagem_udp(sock, addr, mensagem)
