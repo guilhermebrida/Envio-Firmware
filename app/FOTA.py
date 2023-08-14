@@ -234,7 +234,8 @@ def periodic_query(ids_desatualizados:list):
 
 @retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
 def sending_bytes(device_id, addr,blocos_de_dados):
-    for bloco in blocos_de_dados:
+    for i,bloco in enumerate(blocos_de_dados):
+        print(i)
         session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
             {"send_datetime": datetime.now()}
         )
@@ -277,14 +278,14 @@ async def main():
                 blocos_de_dados = Arquivos(device_id)
             if device_id in RSN_DICT:
                 blocos_de_dados= await Verifica_tabela(device_id)
-                if ip_equipamento not in equipamentos_executados:
+                # if ip_equipamento not in equipamentos_executados:
                     # await enviar_bloco(sock, bloco, addr)
                     # thread2 = Thread(target=sending_bytes, args=(device_id, addr, blocos_de_dados))
                     # thread2.start()
                     # thread2.join()
-                    sending_bytes(device_id, addr, blocos_de_dados)
-                    equipamentos_executados[ip_equipamento] = True
-                    print(equipamentos_executados)
+                sending_bytes(device_id, addr, blocos_de_dados)
+                equipamentos_executados[ip_equipamento] = True
+                print(equipamentos_executados)
     except KeyboardInterrupt:
         print("CRLT + C")            
             # await Verifica_tabela('teste')
