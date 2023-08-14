@@ -1,5 +1,5 @@
 import socket
-import XVM
+import app.XVM as XVM
 import re
 import psycopg2
 import os
@@ -13,7 +13,8 @@ from sqlalchemy.orm import sessionmaker,declarative_base
 from datetime import datetime
 from threading import Thread, Lock
 import threading
-
+import sys
+# sys.path.append('./app/')
 
 ips = []
 ALREADY_LISTEN = []
@@ -210,7 +211,7 @@ def Verifica_ID():
     )
     result = session.execute(stmt)
     ids = [row.device_id for row in result.scalars()]
-    if ids is not '[]':
+    if len(ids) != 0:
         print(ids)
         return ids
     print('Todos os dispositivos estão atualizados')
