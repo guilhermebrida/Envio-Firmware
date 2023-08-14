@@ -152,20 +152,17 @@ def solicitar_serial_number(sock, device_id, addr):
 
 @retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
 def enviar_mensagem_udp(sock, addr, mensagem):
-    try:
+    # try:
         timeout = 5
         if isinstance(mensagem, bytes):
-            # print(mensagem)
+            print(mensagem[:30])
             sock.sendto(mensagem, addr)
         else:
-            # print(mensagem)
+            print(mensagem[:30])
             sock.sendto(mensagem.encode(), addr)
         start_time = time.time()
-        response = Thread(target=receber_mensagem_udp, args=()).start()
+        response, _ = sock.recvfrom(1024)
         print(response)
-        if response is None:
-            time.sleep(2)
-            raise TryAgain
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             # send_ack(sock, addr, response)
             raise TryAgain
@@ -173,17 +170,8 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             print("timeout")
             raise TryAgain
         return response
-    except tenacity.RetryError as e:
-        print("RetryError, COPILOTO SEM COMUNICAÇÃO")
-        print(type(e))
-        # enviar_mensagem_udp(sock, addr, mensagem)
-        print(e)
-        pass
 
 
-def receber_mensagem_udp():
-    response, _ = sock.recvfrom(1024)
-    return response
 
 def send_ack(sock, addr, message):
     if re.search(b'BINA.*',message) is None:
@@ -252,8 +240,8 @@ def sending_bytes(device_id, addr,blocos_de_dados):
             session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
             {"blocs_acks":res,"reception_datetime": datetime.now()}
             )
-        else:
-            raise TryAgain
+        # else:
+        #     raise TryAgain
         # time.sleep(0.3)
     
 
