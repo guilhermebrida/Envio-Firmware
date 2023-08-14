@@ -17,6 +17,7 @@ sys.path.append('./app/')
 diretorio_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), "..")) 
 sys.path.append(diretorio_projeto)
 import app.XVM as XVM
+import tenacity
 
 ips = []
 ALREADY_LISTEN = []
