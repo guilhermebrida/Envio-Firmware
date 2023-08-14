@@ -289,7 +289,7 @@ if __name__ == "__main__":
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind((host, porta))
-        sock.setblocking(False)
+        # sock.setblocking(False)
         # sock.settimeout(60)
         pasta_fw = "./app/Files/"
         path_fw = find(pasta_fw)
