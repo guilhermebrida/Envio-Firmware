@@ -1,5 +1,4 @@
 import socket
-import app.XVM as XVM
 import re
 import psycopg2
 import os
@@ -17,6 +16,7 @@ import sys
 sys.path.append('./app/')
 diretorio_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), "..")) 
 sys.path.append(diretorio_projeto)
+import app.XVM as XVM
 
 ips = []
 ALREADY_LISTEN = []
