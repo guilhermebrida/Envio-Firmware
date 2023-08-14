@@ -232,7 +232,7 @@ def periodic_query(ids_desatualizados:list):
         time.sleep(10)
 
 
-
+@retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
 def sending_bytes(device_id, addr,blocos_de_dados):
     for bloco in blocos_de_dados:
         session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
@@ -240,10 +240,12 @@ def sending_bytes(device_id, addr,blocos_de_dados):
         )
         session.commit()
         res = enviar_mensagem_udp(sock, addr, bloco)
-        if res:
+        if re.search(b'.ACK.*',res):
             session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
             {"blocs_acks":res,"reception_datetime": datetime.now()}
             )
+        else:
+            raise TryAgain
         # time.sleep(0.3)
     
 
