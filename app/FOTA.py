@@ -228,7 +228,7 @@ def periodic_query(ids_desatualizados:list):
             if ids not in ids_desatualizados:
                 ids_desatualizados.append(ids)
                 print(ids_desatualizados)
-            time.sleep(10)
+        time.sleep(10)
 
 
 
