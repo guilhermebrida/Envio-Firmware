@@ -218,7 +218,7 @@ def Verifica_ID():
 
 
 
-def periodic_query(ids_desatualizados:list, lock):
+def periodic_query(ids_desatualizados:list):
     while True:
         ids = Verifica_ID()
         if ids not in ids_desatualizados:
