@@ -224,10 +224,11 @@ def Verifica_ID():
 def periodic_query(ids_desatualizados:list):
     while True:
         ids = Verifica_ID()
-        if ids not in ids_desatualizados:
-            ids_desatualizados.append(ids)
-            print(ids_desatualizados)
-        time.sleep(10)
+        if ids is not None:
+            if ids not in ids_desatualizados:
+                ids_desatualizados.append(ids)
+                print(ids_desatualizados)
+            time.sleep(10)
 
 
 
