@@ -269,9 +269,9 @@ async def main():
             #     device_id = xvmMessage[1]
             device_id = send_ack(sock, addr, data)
             # with lock:
-            print(device_id, ids_desatualizados[0])
-            print(device_id in ids_desatualizados[0])
             if device_id in ids_desatualizados[0]:
+                print(device_id, ids_desatualizados[0])
+                print(device_id in ids_desatualizados[0])
                 solicitar_serial_number(sock, device_id, addr)
                     # envioScript(sock, device_id, addr)
                 print(RSN_DICT)
