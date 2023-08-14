@@ -210,7 +210,7 @@ def Verifica_ID():
     )
     result = session.execute(stmt)
     ids = [row.device_id for row in result.scalars()]
-    if ids is not None or ids is not []:
+    if ids is not []:
         print(ids)
         return ids
     print('Todos os dispositivos estão atualizados')
@@ -246,8 +246,8 @@ async def main():
     # sock.setblocking(False)
     print((host, porta))
     ids_desatualizados = []
-    lock = threading.Lock()
-    thread = Thread(target=periodic_query, args=(ids_desatualizados,lock))
+    # lock = threading.Lock()
+    thread = Thread(target=periodic_query, args=(ids_desatualizados,))
     thread.start()
     try :
         while True:
@@ -260,9 +260,9 @@ async def main():
             #     xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
             #     device_id = xvmMessage[1]
             device_id = send_ack(sock, addr, data)
-            with lock:
-                print(device_id, ids_desatualizados[0])
-                print(device_id in ids_desatualizados[0])
+            # with lock:
+            print(device_id, ids_desatualizados[0])
+            print(device_id in ids_desatualizados[0])
             if device_id in ids_desatualizados[0]:
                 solicitar_serial_number(sock, device_id, addr)
                     # envioScript(sock, device_id, addr)
