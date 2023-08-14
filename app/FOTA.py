@@ -304,10 +304,10 @@ if __name__ == "__main__":
         print("Finalizando")
     # except socket.timeout:
         # pass
-    finally:
-        sock.shutdown(socket.SHUT_RDWR)
-        sock.close()
-        exit()
+    # finally:
+    #     sock.shutdown(socket.SHUT_RDWR)
+    #     sock.close()
+    #     exit()
 
 
 
