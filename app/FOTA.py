@@ -210,7 +210,7 @@ def Verifica_ID():
     )
     result = session.execute(stmt)
     ids = [row.device_id for row in result.scalars()]
-    if ids is not []:
+    if ids is not '[]':
         print(ids)
         return ids
     print('Todos os dispositivos estão atualizados')
