@@ -183,7 +183,8 @@ async def get_response():
     start_time = time.perf_counter()
     while time.perf_counter() - start_time < timout:
         print(time.perf_counter() - start_time)
-        res = sock.recv(1024)
+        res, _ = sock.recv(1024)
+        print(res)
         return res
     raise TimeoutError
 
