@@ -161,7 +161,7 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             print(mensagem[:30])
             sock.sendto(mensagem.encode(), addr)
         start_time = time.time()
-        # response, _ = sock.recvfrom(1024)
+        response, _ = sock.recvfrom(1024)
         response = get_response()
         print(response)
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
@@ -306,7 +306,6 @@ async def main():
                 print(device_id in ids_desatualizados[0])
                 solicitar_serial_number(sock, device_id, addr)
                 print(RSN_DICT)
-            if device_id in RSN_DICT:
                 blocos_de_dados = Arquivos(device_id)
             if device_id in RSN_DICT:
                 blocos_de_dados= await Verifica_tabela(device_id)
