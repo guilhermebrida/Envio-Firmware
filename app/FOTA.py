@@ -137,10 +137,10 @@ def find(pasta):
     return path
 
 
-def solicitar_serial_number(sock, device_id, addr):
+async def solicitar_serial_number(sock, device_id, addr):
     xvm = XVM.generateXVM(device_id, str(8000).zfill(4), '>QSN<')
     print(xvm)
-    response = enviar_mensagem_udp(sock,addr,xvm)
+    response = await enviar_mensagem_udp(sock,addr,xvm)
     result = re.search('>RSN.*', response.decode())
     if result is not None:
         rsn = result.group()
