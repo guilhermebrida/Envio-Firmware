@@ -162,7 +162,6 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             sock.sendto(mensagem.encode(), addr)
         start_time = time.time()
         response, _ = sock.recvfrom(1024)
-        response = get_response()
         print(response)
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             # send_ack(sock, addr, response)
@@ -177,16 +176,16 @@ def enviar_mensagem_udp(sock, addr, mensagem):
     except RetryError:
         pass
 
-def get_response():
-    print('ESPERANDO')
-    timout = 7
-    start_time = time.perf_counter()
-    while time.perf_counter() - start_time < timout:
-        print(time.perf_counter() - start_time)
-        res, _ = sock.recvfrom(1024)
-        print(res)
-        return res
-    raise TimeoutError
+# def get_response():
+#     print('ESPERANDO')
+#     timout = 7
+#     start_time = time.perf_counter()
+#     while time.perf_counter() - start_time < timout:
+#         print(time.perf_counter() - start_time)
+#         res, _ = sock.recvfrom(1024)
+#         print(res)
+#         return res
+#     raise TimeoutError
 
 def send_ack(sock, addr, message):
     if re.search(b'BINA.*',message) is None:
