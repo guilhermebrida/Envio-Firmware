@@ -179,11 +179,11 @@ async def enviar_mensagem_udp(sock, addr, mensagem):
 
 async def get_response():
     print('ESPERANDO')
-    timout = 5
+    timout = 7
     start_time = time.perf_counter()
     while time.perf_counter() - start_time < timout:
         print(time.perf_counter() - start_time)
-        res = sock.recv(1024)
+        res, _ = sock.recvfrom(1024)
         print(res)
         return res
     raise TimeoutError
