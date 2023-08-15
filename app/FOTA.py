@@ -303,7 +303,7 @@ async def main():
             if device_id in ids_desatualizados:
                 print(device_id, ids_desatualizados[0])
                 print(device_id in ids_desatualizados[0])
-                solicitar_serial_number(sock, device_id, addr)
+                await solicitar_serial_number(sock, device_id, addr)
                 print(RSN_DICT)
             if device_id in RSN_DICT:
                 blocos_de_dados = Arquivos(device_id)
