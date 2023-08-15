@@ -169,23 +169,12 @@ def enviar_mensagem_udp(sock, addr, mensagem):
         if time.time() - start_time >= timeout:
             print("timeout")
             raise TryAgain
-        if TimeoutError:
-            print('TimeoutError')
-            raise TryAgain
         return response
     except RetryError:
         pass
 
-# def get_response():
-#     print('ESPERANDO')
-#     timout = 7
-#     start_time = time.perf_counter()
-#     while time.perf_counter() - start_time < timout:
-#         print(time.perf_counter() - start_time)
-#         res, _ = sock.recvfrom(1024)
-#         print(res)
-#         return res
-#     raise TimeoutError
+
+
 
 def send_ack(sock, addr, message):
     if re.search(b'BINA.*',message) is None:
@@ -210,6 +199,7 @@ async def Verifica_tabela(device_id):
     
     for row in result.scalars():
         blocos.append(row)
+    # print(blocos)
     return blocos
 
 def Verifica_ID():
@@ -223,6 +213,7 @@ def Verifica_ID():
     result = session.execute(stmt)
     ids = [row.device_id for row in result.scalars()]
     if len(ids) != 0:
+        print(ids)
         return ids
     print('Todos os dispositivos estão atualizados')
     return None
@@ -258,8 +249,8 @@ def sending_bytes(device_id, addr,blocos_de_dados):
         #     raise TryAgain
     except RetryError as e:
         print(e)
-        print('\n---------RELOAD TABLE----------\n')
         reload_table(device_id)
+
         # time.sleep(0.3)
 
 def reload_table(device_id):
@@ -299,7 +290,6 @@ async def main():
             device_id = send_ack(sock, addr, data)
             # lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
             # print('LISTA IDS:',lista_ids)
-            print('IDS DESATUALIZADOS:',ids_desatualizados)
             if device_id in ids_desatualizados:
                 print(device_id, ids_desatualizados[0])
                 print(device_id in ids_desatualizados[0])
@@ -315,7 +305,6 @@ async def main():
                     # thread2.join()
                 threading.Thread(target=contador, daemon=True).start()
                 sending_bytes(device_id, addr, blocos_de_dados)
-                
                 equipamentos_executados[ip_equipamento] = True
                 print(equipamentos_executados)
     except KeyboardInterrupt:
@@ -342,7 +331,3 @@ if __name__ == "__main__":
     #     sock.shutdown(socket.SHUT_RDWR)
     #     sock.close()
     #     exit()
-
-
-
-
