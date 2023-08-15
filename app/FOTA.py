@@ -225,9 +225,9 @@ def periodic_query(ids_desatualizados:list):
         ids = Verifica_ID()
         if ids is not None:
             for id in ids:
-                if ids not in ids_desatualizados:
-                    ids_desatualizados.append(ids)
-        print(ids_desatualizados)
+                if id not in ids_desatualizados:
+                    ids_desatualizados.append(id)
+        # print(ids_desatualizados)
         time.sleep(10)
 
 
