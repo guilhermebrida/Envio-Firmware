@@ -216,7 +216,7 @@ def Verifica_ID():
         print(ids)
         return ids
     print('Todos os dispositivos estão atualizados')
-    
+    return None
 
 
 
@@ -224,9 +224,10 @@ def periodic_query(ids_desatualizados:list):
     while True:
         ids = Verifica_ID()
         if ids is not None:
-            if ids not in ids_desatualizados:
-                ids_desatualizados.append(ids)
-                print(ids_desatualizados)
+            for id in ids:
+                if ids not in ids_desatualizados:
+                    ids_desatualizados.append(ids)
+        print(ids_desatualizados)
         time.sleep(10)
 
 
@@ -261,7 +262,7 @@ def reload_table(device_id):
     )
     result = session.execute(stmt)
     acks = [row for row in result.scalars()]
-    print(acks)
+    print(len(acks))
     for ack in acks:
         session.query(Firmware).filter_by(device_id=device_id,blocs_acks=ack).update(
             {"blocs_acks":None, "send_datetime": None, "reception_datetime": None}
@@ -272,7 +273,7 @@ def reload_table(device_id):
 def contador():
     count = 0
     while True:
-        print("Contador:", count)
+        # print("Contador:", count)
         count += 1
         time.sleep(1)
 
@@ -287,9 +288,9 @@ async def main():
             ip_equipamento = addr[0]
             print(data,ip_equipamento)
             device_id = send_ack(sock, addr, data)
-            lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
-            print(lista_ids)
-            if device_id in lista_ids:
+            # lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
+            # print('LISTA IDS:',lista_ids)
+            if device_id in ids_desatualizados:
                 print(device_id, ids_desatualizados[0])
                 print(device_id in ids_desatualizados[0])
                 solicitar_serial_number(sock, device_id, addr)
