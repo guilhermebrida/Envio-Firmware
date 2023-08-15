@@ -287,8 +287,9 @@ async def main():
             ip_equipamento = addr[0]
             print(data,ip_equipamento)
             device_id = send_ack(sock, addr, data)
-            print(ids_desatualizados)
-            if device_id in ids_desatualizados:
+            lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
+            print(lista_ids)
+            if device_id in lista_ids:
                 print(device_id, ids_desatualizados[0])
                 print(device_id in ids_desatualizados[0])
                 solicitar_serial_number(sock, device_id, addr)
