@@ -152,7 +152,7 @@ def solicitar_serial_number(sock, device_id, addr):
 
 @retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
 def enviar_mensagem_udp(sock, addr, mensagem):
-    # try:
+    try:
         timeout = 5
         if isinstance(mensagem, bytes):
             print(mensagem[:30])
@@ -170,6 +170,9 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             print("timeout")
             raise TryAgain
         return response
+    except RetryError:
+        pass
+
 
 
 
@@ -229,45 +232,65 @@ def periodic_query(ids_desatualizados:list):
 
 @retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
 def sending_bytes(device_id, addr,blocos_de_dados):
-    for i,bloco in enumerate(blocos_de_dados):
-        print(i)
-        session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
-            {"send_datetime": datetime.now()}
-        )
-        session.commit()
-        res = enviar_mensagem_udp(sock, addr, bloco)
-        if re.search(b'.ACK.*',res):
+    try:
+        for bloco in blocos_de_dados:
             session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
-            {"blocs_acks":res,"reception_datetime": datetime.now()}
+                {"send_datetime": datetime.now()}
             )
+            session.commit()
+            res = enviar_mensagem_udp(sock, addr, bloco)
+            if re.search(b'.ACK.*',res):
+                session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
+                {"blocs_acks":res,"reception_datetime": datetime.now()}
+                )
+                session.commit()
         # else:
         #     raise TryAgain
+    except RetryError as e:
+        print(e)
+        reload_table(device_id)
+
         # time.sleep(0.3)
-    
+
+def reload_table(device_id):
+    stmt = (
+        select(Firmware.content_blocs)
+        .where(
+        (Firmware.device_id == device_id)&
+        (Firmware.blocs_acks != None))
+    )
+    result = session.execute(stmt)
+    acks = [row for row in result.scalars()]
+    print(acks)
+    for ack in acks:
+        session.query(Firmware).filter_by(device_id=device_id,blocs_acks=ack).update(
+            {"blocs_acks":None, "send_datetime": None, "reception_datetime": None}
+        )
+        session.commit()
+
+
+def contador():
+    count = 0
+    while True:
+        print("Contador:", count)
+        count += 1
+        time.sleep(1)
 
 async def main():
     print((host, porta))
     ids_desatualizados = []
-    # lock = threading.Lock()
     thread = Thread(target=periodic_query, args=(ids_desatualizados,))
     thread.start()
     try :
         while True:
-            # ids_desatualizados = await Verifica_ID()
             data, addr = sock.recvfrom(1024)
             ip_equipamento = addr[0]
             print(data,ip_equipamento)
-            # if ip_equipamento not in equipamentos_executados:
-            # if re.search(b'BINA.*',data) is None:
-            #     xvmMessage = XVM.parseXVM(data.decode(errors='ignore'))
-            #     device_id = xvmMessage[1]
             device_id = send_ack(sock, addr, data)
-            # with lock:
             if device_id in ids_desatualizados[0]:
                 print(device_id, ids_desatualizados[0])
                 print(device_id in ids_desatualizados[0])
                 solicitar_serial_number(sock, device_id, addr)
-                    # envioScript(sock, device_id, addr)
                 print(RSN_DICT)
                 blocos_de_dados = Arquivos(device_id)
             if device_id in RSN_DICT:
@@ -277,6 +300,7 @@ async def main():
                     # thread2 = Thread(target=sending_bytes, args=(device_id, addr, blocos_de_dados))
                     # thread2.start()
                     # thread2.join()
+                threading.Thread(target=contador, daemon=True).start()
                 sending_bytes(device_id, addr, blocos_de_dados)
                 equipamentos_executados[ip_equipamento] = True
                 print(equipamentos_executados)
