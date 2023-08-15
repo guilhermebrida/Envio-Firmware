@@ -15,6 +15,6 @@ services:
     networks:
       - backing-services
 
-networks: 
-  backing-services:
-    driver: bridge
+# networks: 
+#   backing-services:
+#     driver: bridge
