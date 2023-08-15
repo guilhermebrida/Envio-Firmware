@@ -140,7 +140,7 @@ def find(pasta):
 async def solicitar_serial_number(sock, device_id, addr):
     xvm = XVM.generateXVM(device_id, str(8000).zfill(4), '>QSN<')
     print(xvm)
-    response = await enviar_mensagem_udp(sock,addr,xvm)
+    response = enviar_mensagem_udp(sock,addr,xvm)
     result = re.search('>RSN.*', response.decode())
     if result is not None:
         rsn = result.group()
@@ -151,7 +151,7 @@ async def solicitar_serial_number(sock, device_id, addr):
             RSN_DICT[device_id] = sn
 
 @retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
-async def enviar_mensagem_udp(sock, addr, mensagem):
+def enviar_mensagem_udp(sock, addr, mensagem):
     try:
         timeout = 5
         if isinstance(mensagem, bytes):
@@ -162,7 +162,7 @@ async def enviar_mensagem_udp(sock, addr, mensagem):
             sock.sendto(mensagem.encode(), addr)
         start_time = time.time()
         # response, _ = sock.recvfrom(1024)
-        response = await get_response()
+        response = get_response()
         print(response)
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             # send_ack(sock, addr, response)
@@ -177,7 +177,7 @@ async def enviar_mensagem_udp(sock, addr, mensagem):
     except RetryError:
         pass
 
-async def get_response():
+def get_response():
     print('ESPERANDO')
     timout = 7
     start_time = time.perf_counter()
@@ -304,7 +304,7 @@ async def main():
             if device_id in ids_desatualizados:
                 print(device_id, ids_desatualizados[0])
                 print(device_id in ids_desatualizados[0])
-                await solicitar_serial_number(sock, device_id, addr)
+                solicitar_serial_number(sock, device_id, addr)
                 print(RSN_DICT)
             if device_id in RSN_DICT:
                 blocos_de_dados = Arquivos(device_id)
