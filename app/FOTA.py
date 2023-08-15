@@ -151,7 +151,7 @@ def solicitar_serial_number(sock, device_id, addr):
             RSN_DICT[device_id] = sn
 
 @retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
-def enviar_mensagem_udp(sock, addr, mensagem):
+async def enviar_mensagem_udp(sock, addr, mensagem):
     try:
         timeout = 5
         if isinstance(mensagem, bytes):
@@ -161,7 +161,8 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             print(mensagem[:30])
             sock.sendto(mensagem.encode(), addr)
         start_time = time.time()
-        response, _ = sock.recvfrom(1024)
+        # response, _ = sock.recvfrom(1024)
+        response = await get_response()
         print(response)
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             # send_ack(sock, addr, response)
@@ -169,12 +170,22 @@ def enviar_mensagem_udp(sock, addr, mensagem):
         if time.time() - start_time >= timeout:
             print("timeout")
             raise TryAgain
+        if TimeoutError:
+            print('TimeoutError')
+            raise TryAgain
         return response
     except RetryError:
         pass
 
-
-
+async def get_response():
+    print('ESPERANDO')
+    timout = 5
+    start_time = time.perf_counter()
+    while time.perf_counter() - start_time < timout:
+        print(time.perf_counter() - start_time)
+        res = sock.recv(1024)
+        return res
+    raise TimeoutError
 
 def send_ack(sock, addr, message):
     if re.search(b'BINA.*',message) is None:
@@ -199,7 +210,6 @@ async def Verifica_tabela(device_id):
     
     for row in result.scalars():
         blocos.append(row)
-    # print(blocos)
     return blocos
 
 def Verifica_ID():
@@ -213,7 +223,6 @@ def Verifica_ID():
     result = session.execute(stmt)
     ids = [row.device_id for row in result.scalars()]
     if len(ids) != 0:
-        print(ids)
         return ids
     print('Todos os dispositivos estão atualizados')
     return None
@@ -249,8 +258,8 @@ def sending_bytes(device_id, addr,blocos_de_dados):
         #     raise TryAgain
     except RetryError as e:
         print(e)
+        print('\n---------RELOAD TABLE----------\n')
         reload_table(device_id)
-
         # time.sleep(0.3)
 
 def reload_table(device_id):
@@ -290,6 +299,7 @@ async def main():
             device_id = send_ack(sock, addr, data)
             # lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
             # print('LISTA IDS:',lista_ids)
+            print('IDS DESATUALIZADOS:',ids_desatualizados)
             if device_id in ids_desatualizados:
                 print(device_id, ids_desatualizados[0])
                 print(device_id in ids_desatualizados[0])
@@ -305,6 +315,7 @@ async def main():
                     # thread2.join()
                 threading.Thread(target=contador, daemon=True).start()
                 sending_bytes(device_id, addr, blocos_de_dados)
+                
                 equipamentos_executados[ip_equipamento] = True
                 print(equipamentos_executados)
     except KeyboardInterrupt:
