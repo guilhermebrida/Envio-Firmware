@@ -103,11 +103,12 @@ def Arquivos(device_id):
                     bloc = bloco+msg+cs
                     msg = int(msg,16)+1
                     msg = format(msg,'X')
+                    print(msg)
                     b = bytes.fromhex(bloc)
                     BLOCOS.append(b)
                     if i == 0:
                         session.query(Firmware).filter_by(device_id=device_id).update(
-                            {"SN": sn , "content_blocs": b, "inserted_datetime": datetime.now()}
+                            {"SN": sn , "content_blocs": b, "inserted_datetime": datetime.now(), "bloc_sequence":msg}
                             )
                     else:
                         fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=b, inserted_datetime=datetime.now())
