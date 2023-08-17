@@ -172,6 +172,7 @@ def enviar_mensagem_udp(sock, addr, mensagem):
             print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {mensagem[:30]}')
             sock.sendto(mensagem.encode(), addr)
         start_time = time.time() 
+
         # response, _ = sock.recvfrom(1024)
 
 def recever_msg():
@@ -195,7 +196,7 @@ def recever_msg():
                 print(f"SN={sn}")
                 RSN_DICT[device_id] = sn
         if re.search(b'BINAVRFB.*',response):
-            print(f'{response}   {response[::16]}')
+            print(f'{response}   {response[-16::]}')
         # if re.search(b'BINA.*ACK.*',response):
             # session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
             # {"blocs_acks":response,"reception_datetime": datetime.now()}
@@ -365,6 +366,7 @@ async def main():
                     if envio == False:
                         envio = sending_bytes(device_id, addr, blocos_de_dados)
                         print('END SENDING BYTES')
+                        ids_desatualizados.remove(device_id)
                         time.sleep(5)
             time.sleep(0.5)
     except KeyboardInterrupt:
