@@ -20,14 +20,11 @@ import app.XVM as XVM
 import tenacity
 
 ips = []
-ALREADY_LISTEN = []
 RSN_DICT = {}
-VOZ = []
 cabeçalho =  'BINAVSFB'
 bloc =''
 bloco =[]
 path = []
-ID=[]
 blocos_envio = []
 arquivos = None
 BLOCOS = []
@@ -147,7 +144,6 @@ def solicitar_serial_number(sock, device_id, addr):
         sn = rsn.split('_')[0].split('>RSN')[1]
         if sn:
             print(sn)
-            LISTENED.append(device_id)
             RSN_DICT[device_id] = sn
 
 @retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
@@ -155,14 +151,14 @@ def enviar_mensagem_udp(sock, addr, mensagem):
     try:
         timeout = 5
         if isinstance(mensagem, bytes):
-            print(mensagem[:30])
+            print(time.time(), mensagem[:30])
             sock.sendto(mensagem, addr)
         else:
-            print(mensagem[:30])
+            print(time.time(),mensagem[:30])
             sock.sendto(mensagem.encode(), addr)
         start_time = time.time()
         response, _ = sock.recvfrom(1024)
-        print(response)
+        print(time.time(),response)
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             # send_ack(sock, addr, response)
             raise TryAgain
@@ -231,7 +227,7 @@ def periodic_query(ids_desatualizados:list):
         time.sleep(10)
 
 
-@retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
+# @retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
 def sending_bytes(device_id, addr,blocos_de_dados):
     try:
         for bloco in blocos_de_dados:
@@ -245,6 +241,8 @@ def sending_bytes(device_id, addr,blocos_de_dados):
                 {"blocs_acks":res,"reception_datetime": datetime.now()}
                 )
                 session.commit()
+        print('atualizado!')
+        return True
         # else:
         #     raise TryAgain
     except RetryError as e:
@@ -296,7 +294,7 @@ async def main():
                 solicitar_serial_number(sock, device_id, addr)
                 print(RSN_DICT)
                 blocos_de_dados = Arquivos(device_id)
-            if device_id in RSN_DICT:
+            if device_id in RSN_DICT and device_id not in LISTENED:
                 blocos_de_dados= await Verifica_tabela(device_id)
                 # if ip_equipamento not in equipamentos_executados:
                     # await enviar_bloco(sock, bloco, addr)
@@ -305,8 +303,8 @@ async def main():
                     # thread2.join()
                 threading.Thread(target=contador, daemon=True).start()
                 sending_bytes(device_id, addr, blocos_de_dados)
-                equipamentos_executados[ip_equipamento] = True
-                print(equipamentos_executados)
+                LISTENED.append(device_id)
+                print(LISTENED)
     except KeyboardInterrupt:
         print("CRLT + C")            
             # await Verifica_tabela('teste')
