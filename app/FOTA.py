@@ -185,14 +185,15 @@ def recever_msg():
         print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {response}')
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             send_ack(sock, addr, response)
-        result = re.search(b'>RSN.*', response)
-        if result is not None:
-            rsn = result.group()
-            sn = rsn.split('_')[0].split('>RSN')[1]
-            if sn:
-                print(f'device_id={device_id}')
-                print(f"SN={sn}")
-                RSN_DICT[device_id] = sn
+        if re.search(b'>RSN.*', response):
+            result = re.search(b'>RSN.*', response.decode())
+            if result is not None:
+                rsn = result.group()
+                sn = rsn.split('_')[0].split('>RSN')[1]
+                if sn:
+                    print(f'device_id={device_id}')
+                    print(f"SN={sn}")
+                    RSN_DICT[device_id] = sn
         if re.search(b'BINAVRFB.*',response):
             print(f'{response}   {response[-16::]}')
         # if re.search(b'BINA.*ACK.*',response):
