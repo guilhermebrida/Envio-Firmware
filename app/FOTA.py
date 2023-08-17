@@ -151,14 +151,14 @@ def enviar_mensagem_udp(sock, addr, mensagem):
     try:
         timeout = 5
         if isinstance(mensagem, bytes):
-            print(time.time(), mensagem[:30])
+            print(datetime.now(), mensagem[:30])
             sock.sendto(mensagem, addr)
         else:
-            print(time.time(),mensagem[:30])
+            print(datetime.now(),mensagem[:30])
             sock.sendto(mensagem.encode(), addr)
         start_time = time.time()
         response, _ = sock.recvfrom(1024)
-        print(time.time(),response)
+        print(datetime.now(),response)
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             # send_ack(sock, addr, response)
             raise TryAgain
@@ -294,7 +294,7 @@ async def main():
                 solicitar_serial_number(sock, device_id, addr)
                 print(RSN_DICT)
                 blocos_de_dados = Arquivos(device_id)
-            if device_id in RSN_DICT and device_id not in LISTENED:
+            if device_id in RSN_DICT:
                 blocos_de_dados= await Verifica_tabela(device_id)
                 # if ip_equipamento not in equipamentos_executados:
                     # await enviar_bloco(sock, bloco, addr)
@@ -302,9 +302,10 @@ async def main():
                     # thread2.start()
                     # thread2.join()
                 threading.Thread(target=contador, daemon=True).start()
-                sending_bytes(device_id, addr, blocos_de_dados)
-                LISTENED.append(device_id)
-                print(LISTENED)
+                if device_id not in LISTENED:
+                    sending_bytes(device_id, addr, blocos_de_dados)
+                    LISTENED.append(device_id)
+                    print(LISTENED)
     except KeyboardInterrupt:
         print("CRLT + C")            
             # await Verifica_tabela('teste')
