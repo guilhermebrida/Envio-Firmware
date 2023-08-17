@@ -292,24 +292,23 @@ async def main():
             # lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
             # print('LISTA IDS:',lista_ids)
             print(LISTENED)
-            if device_id not in LISTENED:
-                if device_id in ids_desatualizados:
-                    print(device_id, ids_desatualizados[0])
-                    print(device_id in ids_desatualizados[0])
-                    solicitar_serial_number(sock, device_id, addr)
-                    print(RSN_DICT)
-                    blocos_de_dados = Arquivos(device_id)
-                if device_id in RSN_DICT:
-                    blocos_de_dados= await Verifica_tabela(device_id)
-                    # if ip_equipamento not in equipamentos_executados:
-                        # await enviar_bloco(sock, bloco, addr)
-                        # thread2 = Thread(target=sending_bytes, args=(device_id, addr, blocos_de_dados))
-                        # thread2.start()
-                        # thread2.join()
-                    # threading.Thread(target=contador, daemon=True).start()
-                    sending_bytes(device_id, addr, blocos_de_dados)
-                    LISTENED.append(device_id)
-                    print(LISTENED)
+            if device_id in ids_desatualizados:
+                print(device_id, ids_desatualizados[0])
+                print(device_id in ids_desatualizados[0])
+                solicitar_serial_number(sock, device_id, addr)
+                print(RSN_DICT)
+                blocos_de_dados = Arquivos(device_id)
+            if device_id in RSN_DICT and device_id not in LISTENED:
+                blocos_de_dados= await Verifica_tabela(device_id)
+                # if ip_equipamento not in equipamentos_executados:
+                    # await enviar_bloco(sock, bloco, addr)
+                    # thread2 = Thread(target=sending_bytes, args=(device_id, addr, blocos_de_dados))
+                    # thread2.start()
+                    # thread2.join()
+                # threading.Thread(target=contador, daemon=True).start()
+                sending_bytes(device_id, addr, blocos_de_dados)
+                LISTENED.append(device_id)
+                print(LISTENED)
     except KeyboardInterrupt:
         print("CRLT + C")            
             # await Verifica_tabela('teste')
