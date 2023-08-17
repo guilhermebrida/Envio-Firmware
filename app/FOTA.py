@@ -225,7 +225,7 @@ def send_ack(sock, addr, message):
         sock.sendto(ack.encode(), addr)
         # return device_id
 
-async def Verifica_tabela(device_id):
+def Verifica_tabela(device_id):
     blocos = []
     stmt = (
         select(Firmware.content_blocs)
@@ -345,16 +345,19 @@ async def main():
                 solicitar_serial_number()
                 print(f'RSN_DICT={RSN_DICT}')
             if device_id in RSN_DICT:
-                blocos_de_dados = Arquivos(device_id)
-                blocos_de_dados= await Verifica_tabela(device_id)
+                if device_id in LISTENED:
+                    # blocos_de_dados = Arquivos(device_id)
+                    Arquivos(device_id)
+                    LISTENED.append(device_id)
+                blocos_de_dados= Verifica_tabela(device_id)
+                if blocos_de_dados:
                 # if ip_equipamento not in equipamentos_executados:
                     # await enviar_bloco(sock, bloco, addr)
                     # thread2 = Thread(target=sending_bytes, args=(device_id, addr, blocos_de_dados))
                     # thread2.start()
                     # thread2.join()
                 # threading.Thread(target=contador, daemon=True).start()
-                sending_bytes(device_id, addr, blocos_de_dados)
-                LISTENED.append(device_id)
+                    sending_bytes(device_id, addr, blocos_de_dados)
                 print(f'FAZENDO APPEND {LISTENED}')
             time.sleep(0.5)
     except KeyboardInterrupt:
