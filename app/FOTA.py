@@ -301,24 +301,23 @@ async def main():
             # lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
             # print('LISTA IDS:',lista_ids)
             # print('LISTENED:',LISTENED)
-            if device_id not in LISTENED:
-                if device_id in ids_desatualizados:
-                    print(device_id, ids_desatualizados[0])
-                    print(device_id in ids_desatualizados[0])
-                    solicitar_serial_number(device_id)
-                    print(RSN_DICT)
-                    blocos_de_dados = Arquivos(device_id)
-                if device_id in RSN_DICT:
-                    blocos_de_dados= await Verifica_tabela(device_id)
-                    # if ip_equipamento not in equipamentos_executados:
-                        # await enviar_bloco(sock, bloco, addr)
-                        # thread2 = Thread(target=sending_bytes, args=(device_id, addr, blocos_de_dados))
-                        # thread2.start()
-                        # thread2.join()
-                    # threading.Thread(target=contador, daemon=True).start()
-                    sending_bytes(device_id, addr, blocos_de_dados)
-                    LISTENED.append(device_id)
-                    print('FAZENDO APPEND',LISTENED)
+            if device_id in ids_desatualizados:
+                print(device_id, ids_desatualizados[0])
+                print(device_id in ids_desatualizados[0])
+                solicitar_serial_number(device_id)
+                print(RSN_DICT)
+                blocos_de_dados = Arquivos(device_id)
+            if device_id in RSN_DICT:
+                blocos_de_dados= await Verifica_tabela(device_id)
+                # if ip_equipamento not in equipamentos_executados:
+                    # await enviar_bloco(sock, bloco, addr)
+                    # thread2 = Thread(target=sending_bytes, args=(device_id, addr, blocos_de_dados))
+                    # thread2.start()
+                    # thread2.join()
+                # threading.Thread(target=contador, daemon=True).start()
+                sending_bytes(device_id, addr, blocos_de_dados)
+                LISTENED.append(device_id)
+                print('FAZENDO APPEND',LISTENED)
             time.sleep(0.5)
     except KeyboardInterrupt:
         print("CRLT + C")            
