@@ -84,6 +84,8 @@ Session = sessionmaker(bind=engine, autoflush=True )
 session = Session()
 
 def Arquivos(device_id):
+        print("===================================================================================")
+        print("== Arquivos()")
         print("devicd_id=",device_id)
         sn = RSN_DICT[device_id]
         # print(path_voz)
@@ -139,6 +141,8 @@ def find(pasta):
 def solicitar_serial_number():
     global device_id
     global addr
+    print("===================================================================================")
+    print("== solicitar_serial_number()")
     xvm = XVM.generateXVM(device_id, str(8000).zfill(4), '>QSN<')
     print(xvm)
     enviar_mensagem_udp(sock,addr,xvm)
@@ -153,6 +157,8 @@ def solicitar_serial_number():
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(3))
 def enviar_mensagem_udp(sock, addr, mensagem):
     # try:
+        print("===================================================================================")
+        print("== enviar_mensagem_udp()")
         timeout = 5
         if isinstance(mensagem, bytes):
             print(datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), mensagem[:30])
@@ -167,6 +173,8 @@ def recever_msg():
     global device_id
     global addr
     while True:
+        print("===================================================================================")
+        print("== recever_msg()")
         response,addr = sock.recvfrom(1024)
         ip_equipamento = addr[0]
         print(response,ip_equipamento)
@@ -178,6 +186,7 @@ def recever_msg():
             rsn = result.group()
             sn = rsn.split('_')[0].split('>RSN')[1]
             if sn:
+                print('device_id=',device_id)
                 print("SN=",sn)
                 RSN_DICT[device_id] = sn
 
@@ -317,6 +326,8 @@ async def main():
             # lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
             # print('LISTA IDS:',lista_ids)
             # print('LISTENED:',LISTENED)
+            print("===================================================================================")
+            print("== main()")
             print(device_id)
             if device_id in ids_desatualizados:
                 print(device_id, ids_desatualizados[0])
