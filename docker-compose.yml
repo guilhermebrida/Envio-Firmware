@@ -17,10 +17,10 @@ services:
 volumes:
   postgres_data:
 
-# networks: 
-#   backing-services:
-#     driver: bridge
-
+networks: 
+  backing-services:
+    driver: bridge
+    external: true
 # networks: 
 #   backing-services:
 #     external: true
