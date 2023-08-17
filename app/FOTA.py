@@ -69,6 +69,7 @@ class Firmware(Base):
 
     device_id = Column(String, primary_key=True)
     SN = Column(String, default=None)
+    bloc_sequence = Column(int, default=None)
     content_blocs = Column(LargeBinary)
     blocs_acks = Column(LargeBinary)
     inserted_datetime = Column(DateTime, default=None)
@@ -111,7 +112,9 @@ def Arquivos(device_id):
                             {"SN": sn , "content_blocs": b, "inserted_datetime": datetime.now(), "bloc_sequence":msg}
                             )
                     else:
-                        fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=b, inserted_datetime=datetime.now())
+                        fw=Firmware(device_id=device_id,SN=RSN_DICT[device_id],content_blocs=b, 
+                                inserted_datetime=datetime.now(),bloc_sequence=msg
+                                )
                         session.add(fw)
                     session.commit()
         print('return')
