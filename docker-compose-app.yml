@@ -17,4 +17,4 @@ services:
 
 networks: 
   backing-services:
-    driver: bridge
+    external: true
