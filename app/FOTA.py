@@ -137,6 +137,8 @@ def find(pasta):
 
 
 def solicitar_serial_number():
+    global device_id
+    global addr
     xvm = XVM.generateXVM(device_id, str(8000).zfill(4), '>QSN<')
     print(xvm)
     response = enviar_mensagem_udp(sock,addr,xvm)
@@ -162,6 +164,7 @@ def enviar_mensagem_udp(sock, addr, mensagem):
         # response, _ = sock.recvfrom(1024)
 
 def recever_msg():
+    global addr
     while True:
         response,addr = sock.recvfrom(1024)
         ip_equipamento = addr[0]
@@ -292,6 +295,8 @@ def contador():
         time.sleep(1)
 
 async def main():
+    global device_id
+    global addr
     print((host, porta))
     ids_desatualizados = []
     thread = Thread(target=periodic_query, args=(ids_desatualizados,))
@@ -309,7 +314,7 @@ async def main():
             if device_id in ids_desatualizados:
                 print(device_id, ids_desatualizados[0])
                 print(device_id in ids_desatualizados[0])
-                solicitar_serial_number(device_id)
+                solicitar_serial_number()
                 print(RSN_DICT)
                 blocos_de_dados = Arquivos(device_id)
             if device_id in RSN_DICT:
