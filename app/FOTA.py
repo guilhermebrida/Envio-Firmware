@@ -194,7 +194,8 @@ def recever_msg():
                 print(f'device_id={device_id}')
                 print(f"SN={sn}")
                 RSN_DICT[device_id] = sn
-        # if re.search(b'BINA.*ACK.*',response):
+        if re.search(b'BINA.*ACK.*',response):
+            print(response.decode())
             # session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
             # {"blocs_acks":response,"reception_datetime": datetime.now()}
             # )
