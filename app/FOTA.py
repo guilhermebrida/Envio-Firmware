@@ -108,6 +108,7 @@ def Arquivos(device_id):
                     b = bytes.fromhex(bloc)
                     BLOCOS.append(b)
                     if i == 0:
+                        print(msg,b)
                         session.query(Firmware).filter_by(device_id=device_id).update(
                             {"SN": sn , "content_blocs": b, "inserted_datetime": datetime.now(), "bloc_sequence":msg}
                             )
