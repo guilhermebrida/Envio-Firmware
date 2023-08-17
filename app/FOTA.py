@@ -185,7 +185,7 @@ def recever_msg():
         print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {response}')
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             send_ack(sock, addr, response)
-        result = re.search('RSN.*', response.decode())
+        result = re.search(b'RSN.*', response)
         if result is not None:
             rsn = result.group()
             sn = rsn.split('_')[0].split('RSN')[1]
@@ -364,7 +364,6 @@ async def main():
                     if envio == False:
                         envio = sending_bytes(device_id, addr, blocos_de_dados)
                         print('END SENDING BYTES',ids_desatualizados)
-                        ids_desatualizados.pop(0)
                         time.sleep(5)
             time.sleep(0.5)
     except KeyboardInterrupt:
