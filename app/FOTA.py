@@ -86,7 +86,7 @@ session = Session()
 def Arquivos(device_id):
         print("===================================================================================")
         print("== Arquivos()")
-        print("devicd_id=",device_id)
+        print(f"devicd_id={device_id}")
         sn = RSN_DICT[device_id]
         # print(path_voz)
         for files in path_fw:
@@ -162,10 +162,10 @@ def enviar_mensagem_udp(sock, addr, mensagem):
         print("== enviar_mensagem_udp()")
         timeout = 5
         if isinstance(mensagem, bytes):
-            print(datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), mensagem[:30])
+            print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {mensagem[:30]}')
             sock.sendto(mensagem, addr)
         else:
-            print(datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),mensagem[:30])
+            print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {mensagem[:30]}')
             sock.sendto(mensagem.encode(), addr)
         start_time = time.time() 
         # response, _ = sock.recvfrom(1024)
@@ -179,7 +179,7 @@ def recever_msg():
         response,addr = sock.recvfrom(1024)
         ip_equipamento = addr[0]
         print(response,ip_equipamento)
-        print(datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),response)
+        print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {response}')
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             send_ack(sock, addr, response)
         result = re.search('>RSN.*', response.decode())
@@ -187,9 +187,14 @@ def recever_msg():
             rsn = result.group()
             sn = rsn.split('_')[0].split('>RSN')[1]
             if sn:
-                print('device_id=',device_id)
-                print("SN=",sn)
+                print(f'device_id={device_id}')
+                print(f"SN={sn}")
                 RSN_DICT[device_id] = sn
+        # if re.search(b'BINA.*ACK.*',response):
+            # session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
+            # {"blocs_acks":response,"reception_datetime": datetime.now()}
+            # )
+            # session.commit()
 
             # raise TryAgain
         # if time.time() - start_time >= timeout:
@@ -270,11 +275,11 @@ def sending_bytes(device_id, addr,blocos_de_dados):
             )
             session.commit()
             res = enviar_mensagem_udp(sock, addr, bloco)
-            if re.search(b'.ACK.*',res):
-                session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
-                {"blocs_acks":res,"reception_datetime": datetime.now()}
-                )
-                session.commit()
+            # if re.search(b'.ACK.*',res):
+            #     session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
+            #     {"blocs_acks":res,"reception_datetime": datetime.now()}
+            #     )
+            #     session.commit()
         print('atualizado!')
         return True
         # else:
@@ -334,7 +339,7 @@ async def main():
                 print(device_id, ids_desatualizados[0])
                 print(device_id in ids_desatualizados[0])
                 solicitar_serial_number()
-                print(RSN_DICT)
+                print(f'RSN_DICT={RSN_DICT}')
             if device_id in RSN_DICT:
                 blocos_de_dados = Arquivos(device_id)
                 blocos_de_dados= await Verifica_tabela(device_id)
@@ -346,7 +351,7 @@ async def main():
                 # threading.Thread(target=contador, daemon=True).start()
                 sending_bytes(device_id, addr, blocos_de_dados)
                 LISTENED.append(device_id)
-                print('FAZENDO APPEND',LISTENED)
+                print(f'FAZENDO APPEND {LISTENED}')
             time.sleep(0.5)
     except KeyboardInterrupt:
         print("CRLT + C")            
