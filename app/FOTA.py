@@ -141,14 +141,14 @@ def solicitar_serial_number():
     global addr
     xvm = XVM.generateXVM(device_id, str(8000).zfill(4), '>QSN<')
     print(xvm)
-    response = enviar_mensagem_udp(sock,addr,xvm)
-    result = re.search('>RSN.*', response.decode())
-    if result is not None:
-        rsn = result.group()
-        sn = rsn.split('_')[0].split('>RSN')[1]
-        if sn:
-            print(sn)
-            RSN_DICT[device_id] = sn
+    enviar_mensagem_udp(sock,addr,xvm)
+    # result = re.search('>RSN.*', response.decode())
+    # if result is not None:
+    #     rsn = result.group()
+    #     sn = rsn.split('_')[0].split('>RSN')[1]
+    #     if sn:
+    #         print(sn)
+    #         RSN_DICT[device_id] = sn
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(3))
 def enviar_mensagem_udp(sock, addr, mensagem):
@@ -172,7 +172,13 @@ def recever_msg():
         print(datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),response)
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             send_ack(sock, addr, response)
-
+        result = re.search('>RSN.*', response.decode())
+        if result is not None:
+            rsn = result.group()
+            sn = rsn.split('_')[0].split('>RSN')[1]
+            if sn:
+                print(sn)
+                RSN_DICT[device_id] = sn
 
             # raise TryAgain
         # if time.time() - start_time >= timeout:
