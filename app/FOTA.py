@@ -146,27 +146,28 @@ def solicitar_serial_number(sock, device_id, addr):
             print(sn)
             RSN_DICT[device_id] = sn
 
-@retry(stop=stop_after_attempt(10), wait=wait_fixed(3))
+@retry(stop=stop_after_attempt(5), wait=wait_fixed(3))
 def enviar_mensagem_udp(sock, addr, mensagem):
     try:
         timeout = 5
         if isinstance(mensagem, bytes):
-            print(datetime.now(), mensagem[:30])
+            print(datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), mensagem[:30])
             sock.sendto(mensagem, addr)
         else:
-            print(datetime.now(),mensagem[:30])
+            print(datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),mensagem[:30])
             sock.sendto(mensagem.encode(), addr)
         start_time = time.time()
         response, _ = sock.recvfrom(1024)
-        print(datetime.now(),response)
+        print(datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),response)
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
-            # send_ack(sock, addr, response)
+            send_ack(sock, addr, response)
             raise TryAgain
         if time.time() - start_time >= timeout:
             print("timeout")
             raise TryAgain
         return response
     except RetryError:
+        print('RETRY ERRO NA ENVIAR MSG UDP')
         pass
 
 
@@ -245,8 +246,10 @@ def sending_bytes(device_id, addr,blocos_de_dados):
         return True
         # else:
         #     raise TryAgain
+        # if RetryError:
+        #     reload_table(device_id)
     except RetryError as e:
-        print(e)
+        print('RETRY ERRO NA SENDING_BYTES',e)
         reload_table(device_id)
 
         # time.sleep(0.3)
@@ -288,6 +291,7 @@ async def main():
             device_id = send_ack(sock, addr, data)
             # lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
             # print('LISTA IDS:',lista_ids)
+            print(LISTENED)
             if device_id not in LISTENED:
                 if device_id in ids_desatualizados:
                     print(device_id, ids_desatualizados[0])
