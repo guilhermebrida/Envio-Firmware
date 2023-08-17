@@ -69,7 +69,7 @@ class Firmware(Base):
 
     device_id = Column(String, primary_key=True)
     SN = Column(String, default=None)
-    bloc_sequence = Column(Integer)
+    bloc_sequence = Column(String)
     content_blocs = Column(LargeBinary)
     blocs_acks = Column(LargeBinary)
     inserted_datetime = Column(DateTime, default=None)
