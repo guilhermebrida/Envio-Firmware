@@ -134,7 +134,7 @@ def find(pasta):
     return path
 
 
-def solicitar_serial_number(sock, device_id, addr):
+def solicitar_serial_number():
     xvm = XVM.generateXVM(device_id, str(8000).zfill(4), '>QSN<')
     print(xvm)
     response = enviar_mensagem_udp(sock,addr,xvm)
@@ -148,7 +148,7 @@ def solicitar_serial_number(sock, device_id, addr):
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(3))
 def enviar_mensagem_udp(sock, addr, mensagem):
-    try:
+    # try:
         timeout = 5
         if isinstance(mensagem, bytes):
             print(datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), mensagem[:30])
@@ -156,19 +156,28 @@ def enviar_mensagem_udp(sock, addr, mensagem):
         else:
             print(datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),mensagem[:30])
             sock.sendto(mensagem.encode(), addr)
-        start_time = time.time()
-        response, _ = sock.recvfrom(1024)
+        start_time = time.time() 
+        # response, _ = sock.recvfrom(1024)
+
+def recever_msg():
+    while True:
+        response,addr = sock.recvfrom(1024)
+        ip_equipamento = addr[0]
+        print(response,ip_equipamento)
         print(datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),response)
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
             send_ack(sock, addr, response)
-            raise TryAgain
-        if time.time() - start_time >= timeout:
-            print("timeout")
-            raise TryAgain
-        return response
-    except RetryError:
-        print('RETRY ERRO NA ENVIAR MSG UDP')
-        pass
+
+
+            # raise TryAgain
+        # if time.time() - start_time >= timeout:
+        #     print("timeout")
+        #     raise TryAgain
+        # return response
+    # except RetryError:
+    #     print('RETRY ERRO NA ENVIAR MSG UDP')
+    #     pass
+
 
 
 
@@ -181,7 +190,7 @@ def send_ack(sock, addr, message):
         ack = XVM.generateAck(device_id,sequence)
         print(ack)
         sock.sendto(ack.encode(), addr)
-        return device_id
+        # return device_id
 
 async def Verifica_tabela(device_id):
     blocos = []
@@ -283,12 +292,12 @@ async def main():
     ids_desatualizados = []
     thread = Thread(target=periodic_query, args=(ids_desatualizados,))
     thread.start()
+    Thread(target=recever_msg).start()
     try :
         while True:
-            data, addr = sock.recvfrom(1024)
-            ip_equipamento = addr[0]
-            print(data,ip_equipamento)
-            device_id = send_ack(sock, addr, data)
+            # data, addr = sock.recvfrom(1024)
+            
+            # device_id = send_ack(sock)
             # lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
             # print('LISTA IDS:',lista_ids)
             print('LISTENED:',LISTENED)
@@ -296,7 +305,7 @@ async def main():
                 if device_id in ids_desatualizados:
                     print(device_id, ids_desatualizados[0])
                     print(device_id in ids_desatualizados[0])
-                    solicitar_serial_number(sock, device_id, addr)
+                    solicitar_serial_number(device_id)
                     print(RSN_DICT)
                     blocos_de_dados = Arquivos(device_id)
                 if device_id in RSN_DICT:
@@ -317,6 +326,8 @@ async def main():
 
 if __name__ == "__main__":
     try:
+        device_id = None
+        addr = None
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind((host, porta))
         # sock.setblocking(False)
