@@ -334,8 +334,8 @@ async def main():
                 print(device_id in ids_desatualizados[0])
                 solicitar_serial_number()
                 print(RSN_DICT)
-                blocos_de_dados = Arquivos(device_id)
             if device_id in RSN_DICT:
+                blocos_de_dados = Arquivos(device_id)
                 blocos_de_dados= await Verifica_tabela(device_id)
                 # if ip_equipamento not in equipamentos_executados:
                     # await enviar_bloco(sock, bloco, addr)
