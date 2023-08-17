@@ -15,6 +15,6 @@ services:
     networks:
       - backing-services
 
-networks: 
-  backing-services:
-    external: true
+# networks: 
+#   backing-services:
+#     external: true
