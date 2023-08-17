@@ -7,8 +7,8 @@ import asyncio
 import selectors
 import time
 from tenacity import retry, stop_after_delay, wait_fixed, stop_after_attempt, TryAgain, RetryError
-from sqlalchemy import create_engine, Column, String, LargeBinary, DateTime, func, select
-from sqlalchemy.orm import sessionmaker,declarative_base
+from sqlalchemy import create_engine, Column, String, LargeBinary, DateTime, func, select, Integer
+from sqlalchemy.orm import sessionmaker,declarative_base, Mapped
 from datetime import datetime
 from threading import Thread, Lock
 import threading
@@ -69,7 +69,7 @@ class Firmware(Base):
 
     device_id = Column(String, primary_key=True)
     SN = Column(String, default=None)
-    bloc_sequence = Column(int, default=None)
+    bloc_sequence = Column(Integer)
     content_blocs = Column(LargeBinary)
     blocs_acks = Column(LargeBinary)
     inserted_datetime = Column(DateTime, default=None)
