@@ -21,6 +21,10 @@ volumes:
 #   backing-services:
 #     driver: bridge
 
+networks: 
+  backing-services:
+    external: true
+
 
 
 
