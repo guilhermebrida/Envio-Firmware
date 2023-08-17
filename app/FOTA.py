@@ -164,7 +164,7 @@ def enviar_mensagem_udp(sock, addr, mensagem):
     # try:
         print("===================================================================================")
         print("== enviar_mensagem_udp()")
-        timeout = 5
+        # timeout = 5
         if isinstance(mensagem, bytes):
             print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {mensagem[:30]}')
             sock.sendto(mensagem, addr)
@@ -345,12 +345,13 @@ async def main():
                 solicitar_serial_number()
                 print(f'RSN_DICT={RSN_DICT}')
             if device_id in RSN_DICT:
-                if device_id in LISTENED:
+                if device_id not in LISTENED:
                     # blocos_de_dados = Arquivos(device_id)
                     Arquivos(device_id)
+                    print(f'FAZENDO APPEND {LISTENED}')
                     LISTENED.append(device_id)
-                blocos_de_dados= Verifica_tabela(device_id)
-                if blocos_de_dados:
+                if device_id in LISTENED:
+                    blocos_de_dados= Verifica_tabela(device_id)
                 # if ip_equipamento not in equipamentos_executados:
                     # await enviar_bloco(sock, bloco, addr)
                     # thread2 = Thread(target=sending_bytes, args=(device_id, addr, blocos_de_dados))
@@ -358,7 +359,7 @@ async def main():
                     # thread2.join()
                 # threading.Thread(target=contador, daemon=True).start()
                     sending_bytes(device_id, addr, blocos_de_dados)
-                print(f'FAZENDO APPEND {LISTENED}')
+                    print('END SENDING BYTES')
             time.sleep(0.5)
     except KeyboardInterrupt:
         print("CRLT + C")            
