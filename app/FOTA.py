@@ -185,6 +185,7 @@ def recever_msg():
 
 
 def send_ack(sock, addr, message):
+    global device_id
     if re.search(b'BINA.*',message) is None:
         xvmMessage = XVM.parseXVM(message.decode(errors='ignore'))
         device_id = xvmMessage[1]
