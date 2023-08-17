@@ -29,6 +29,8 @@ blocos_envio = []
 arquivos = None
 BLOCOS = []
 LISTENED = []
+device_id = None
+addr = None
 
 postgres_host = os.environ['POSTGRES_HOST']
 postgres_port = os.environ['POSTGRES_PORT']
@@ -328,8 +330,7 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        device_id = None
-        addr = None
+
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind((host, porta))
         # sock.setblocking(False)
