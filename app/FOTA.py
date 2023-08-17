@@ -188,6 +188,7 @@ def send_ack(sock, addr, message):
         device_id = xvmMessage[1]
         sequence = xvmMessage[2]
         ack = XVM.generateAck(device_id,sequence)
+        print(device_id)
         print(ack)
         sock.sendto(ack.encode(), addr)
         # return device_id
@@ -301,6 +302,7 @@ async def main():
             # lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
             # print('LISTA IDS:',lista_ids)
             # print('LISTENED:',LISTENED)
+            print(device_id)
             if device_id in ids_desatualizados:
                 print(device_id, ids_desatualizados[0])
                 print(device_id in ids_desatualizados[0])
