@@ -84,7 +84,7 @@ Session = sessionmaker(bind=engine, autoflush=True )
 session = Session()
 
 def Arquivos(device_id):
-        print(device_id)
+        print("devicd_id=",device_id)
         sn = RSN_DICT[device_id]
         # print(path_voz)
         for files in path_fw:
@@ -164,6 +164,7 @@ def enviar_mensagem_udp(sock, addr, mensagem):
         # response, _ = sock.recvfrom(1024)
 
 def recever_msg():
+    global device_id
     global addr
     while True:
         response,addr = sock.recvfrom(1024)
@@ -177,7 +178,7 @@ def recever_msg():
             rsn = result.group()
             sn = rsn.split('_')[0].split('>RSN')[1]
             if sn:
-                print(sn)
+                print("SN=",sn)
                 RSN_DICT[device_id] = sn
 
             # raise TryAgain
