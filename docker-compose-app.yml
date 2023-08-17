@@ -13,8 +13,9 @@ services:
     external_links:
       - envio-firmware-postgres-1
     networks:
-      - backing-services
+      - app-network
 
-# networks: 
-#   backing-services:
-#     external: true
+networks: 
+  app-network:
+    external: 
+     name: backing-services
