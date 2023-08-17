@@ -349,8 +349,10 @@ async def main():
                     # blocos_de_dados = Arquivos(device_id)
                     Arquivos(device_id)
                     print(f'FAZENDO APPEND {LISTENED}')
+                    time.sleep(5)
                     LISTENED.append(device_id)
                 if device_id in LISTENED:
+                    envio = False
                     blocos_de_dados= Verifica_tabela(device_id)
                 # if ip_equipamento not in equipamentos_executados:
                     # await enviar_bloco(sock, bloco, addr)
@@ -358,8 +360,10 @@ async def main():
                     # thread2.start()
                     # thread2.join()
                 # threading.Thread(target=contador, daemon=True).start()
-                    sending_bytes(device_id, addr, blocos_de_dados)
-                    print('END SENDING BYTES')
+                    if envio == False:
+                        envio = sending_bytes(device_id, addr, blocos_de_dados)
+                        print('END SENDING BYTES')
+                        time.sleep(5)
             time.sleep(0.5)
     except KeyboardInterrupt:
         print("CRLT + C")            
