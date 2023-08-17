@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS public.firmware
 (
     "device_id" text COLLATE pg_catalog."default" NOT NULL,
     "SN" text COLLATE pg_catalog."default" NULL,
-    "sequence_msg" bigint,
+    "bloc_sequence" bigint,
     "content_blocs" bytea,
     "blocs_acks" bytea,
     inserted_datetime timestamp with time zone,
