@@ -102,9 +102,6 @@ def Arquivos(device_id):
                     sep.append(msg)
                     cs =  crc(sep)
                     bloc = bloco+msg+cs
-                    msg = int(msg,16)+1
-                    msg = format(msg,'X')
-                    print(msg)
                     b = bytes.fromhex(bloc)
                     BLOCOS.append(b)
                     if i == 0:
@@ -118,8 +115,9 @@ def Arquivos(device_id):
                                 )
                         session.add(fw)
                     session.commit()
+                    msg = int(msg,16)+1
+                    msg = format(msg,'X')
         print('return')
-        # print(BLOCOS)
         return BLOCOS
 
 
@@ -366,7 +364,7 @@ async def main():
                     if envio == False:
                         envio = sending_bytes(device_id, addr, blocos_de_dados)
                         print('END SENDING BYTES')
-                        ids_desatualizados.remove(device_id)
+                        ids_desatualizados[0].remove(device_id)
                         time.sleep(5)
             time.sleep(0.5)
     except KeyboardInterrupt:
