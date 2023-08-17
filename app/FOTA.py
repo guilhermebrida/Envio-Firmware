@@ -300,7 +300,7 @@ async def main():
             # device_id = send_ack(sock)
             # lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
             # print('LISTA IDS:',lista_ids)
-            print('LISTENED:',LISTENED)
+            # print('LISTENED:',LISTENED)
             if device_id not in LISTENED:
                 if device_id in ids_desatualizados:
                     print(device_id, ids_desatualizados[0])
@@ -319,6 +319,7 @@ async def main():
                     sending_bytes(device_id, addr, blocos_de_dados)
                     LISTENED.append(device_id)
                     print('FAZENDO APPEND',LISTENED)
+            time.sleep(0.5)
     except KeyboardInterrupt:
         print("CRLT + C")            
             # await Verifica_tabela('teste')
