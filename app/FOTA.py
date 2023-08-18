@@ -235,7 +235,7 @@ def Verifica_tabela(device_id):
         select(Firmware.content_blocs)
         .where(
         # (Firmware.device_id == device_id)&
-        (Firmware.blocs_acks == None)).oder_by(Firmware.bloc_sequence.asc())
+        (Firmware.blocs_acks == None)).order_by(Firmware.bloc_sequence.asc())
     )
     
     result = session.execute(stmt)
