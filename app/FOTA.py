@@ -148,29 +148,19 @@ def solicitar_serial_number():
     xvm = XVM.generateXVM(device_id, str(8000).zfill(4), '>QSN<')
     print(xvm)
     enviar_mensagem_udp(sock,addr,xvm)
-    # result = re.search('>RSN.*', response.decode())
-    # if result is not None:
-    #     rsn = result.group()
-    #     sn = rsn.split('_')[0].split('>RSN')[1]
-    #     if sn:
-    #         print(sn)
-    #         RSN_DICT[device_id] = sn
+
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(3))
 def enviar_mensagem_udp(sock, addr, mensagem):
-    # try:
-        print("===================================================================================")
-        print("== enviar_mensagem_udp()")
-        # timeout = 5
-        if isinstance(mensagem, bytes):
-            print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {mensagem[:30]}')
-            sock.sendto(mensagem, addr)
-        else:
-            print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {mensagem[:30]}')
-            sock.sendto(mensagem.encode(), addr)
-        start_time = time.time() 
+    print("===================================================================================")
+    print("== enviar_mensagem_udp()")
+    if isinstance(mensagem, bytes):
+        print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {mensagem[:30]}')
+        sock.sendto(mensagem, addr)
+    else:
+        print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {mensagem[:30]}')
+        sock.sendto(mensagem.encode(), addr)
 
-        # response, _ = sock.recvfrom(1024)
 
 def recever_msg():
     global device_id
@@ -194,29 +184,15 @@ def recever_msg():
             seq = re.search(b'\x80\x00.{2}' ,response)
             if seq is not None:
                 seq = seq.group().hex()
-            # seq = re.search(b'(\\x..\\x..\\x..\\x..)' ,response)
                 print(f'SEQ={seq}')
                 session.query(Firmware).filter_by(device_id=device_id,bloc_sequence=seq).update(
                     {"blocs_acks":response,"reception_datetime": datetime.now()}
                     )
                 session.commit()
-        if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response) or re.search(b'.*RAX.*',response) or re.search(b'.*RTT.*',response):
-        # else:
+        # if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response) or re.search(b'.*RAX.*',response) or re.search(b'.*RTT.*',response):
+        else:
             send_ack(sock, addr, response)
-        # if re.search(b'BINA.*ACK.*',response):
-            # session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
-            # {"blocs_acks":response,"reception_datetime": datetime.now()}
-            # )
-            # session.commit()
 
-            # raise TryAgain
-        # if time.time() - start_time >= timeout:
-        #     print("timeout")
-        #     raise TryAgain
-        # return response
-    # except RetryError:
-    #     print('RETRY ERRO NA ENVIAR MSG UDP')
-    #     pass
 
 
 
@@ -239,23 +215,19 @@ def Verifica_tabela(device_id):
     stmt = (
         select(Firmware.content_blocs)
         .where(
-        # (Firmware.device_id == device_id)&
         (Firmware.blocs_acks == None)).order_by(Firmware.bloc_sequence.asc())
     )
     
     result = session.execute(stmt)
-    
     for row in result.scalars():
         blocos.append(row)
-    # print(blocos)
     return blocos
+
 
 def Verifica_ID():
     stmt = (
         select(Firmware)
         .where(
-        # (Firmware.device_id is not None)
-        #  & 
         (Firmware.SN == None))
     )
     result = session.execute(stmt)
@@ -288,12 +260,7 @@ def sending_bytes(device_id, addr,blocos_de_dados):
             )
             session.commit()
             res = enviar_mensagem_udp(sock, addr, bloco)
-            # if re.search(b'.ACK.*',res):
-            #     session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
-            #     {"blocs_acks":res,"reception_datetime": datetime.now()}
-            #     )
-            #     session.commit()
-            time.sleep(2)
+            time.sleep(4)
         print('atualizado!')
         return True
         # else:
