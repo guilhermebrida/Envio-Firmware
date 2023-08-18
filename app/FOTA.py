@@ -293,7 +293,7 @@ def sending_bytes(device_id, addr,blocos_de_dados):
             #     {"blocs_acks":res,"reception_datetime": datetime.now()}
             #     )
             #     session.commit()
-            time.sleep(5)
+            time.sleep(1)
         print('atualizado!')
         return True
         # else:
@@ -323,13 +323,6 @@ def reload_table(device_id):
         session.commit()
 
 
-def contador():
-    count = 0
-    while True:
-        # print("Contador:", count)
-        count += 1
-        time.sleep(1)
-
 async def main():
     global device_id
     global addr
@@ -340,12 +333,6 @@ async def main():
     Thread(target=recever_msg).start()
     try :
         while True:
-            # data, addr = sock.recvfrom(1024)
-            
-            # device_id = send_ack(sock)
-            # lista_ids = list({item for sublist in ids_desatualizados for item in sublist if item != []})
-            # print('LISTA IDS:',lista_ids)
-            # print('LISTENED:',LISTENED)
             print("===================================================================================")
             print("== main()")
             print(device_id)
@@ -356,7 +343,6 @@ async def main():
                 print(f'RSN_DICT={RSN_DICT}')
             if device_id in RSN_DICT:
                 if device_id not in LISTENED:
-                    # blocos_de_dados = Arquivos(device_id)
                     Arquivos(device_id)
                     print(f'FAZENDO APPEND {LISTENED}')
                     time.sleep(5)
@@ -364,12 +350,6 @@ async def main():
                 if device_id in LISTENED:
                     envio = False
                     blocos_de_dados= Verifica_tabela(device_id)
-                # if ip_equipamento not in equipamentos_executados:
-                    # await enviar_bloco(sock, bloco, addr)
-                    # thread2 = Thread(target=sending_bytes, args=(device_id, addr, blocos_de_dados))
-                    # thread2.start()
-                    # thread2.join()
-                # threading.Thread(target=contador, daemon=True).start()
                     if envio == False:
                         envio = sending_bytes(device_id, addr, blocos_de_dados)
                         print('END SENDING BYTES',ids_desatualizados)
