@@ -105,7 +105,6 @@ def Arquivos(device_id):
                     b = bytes.fromhex(bloc)
                     BLOCOS.append(b)
                     if i == 0:
-                        print(msg,b)
                         session.query(Firmware).filter_by(device_id=device_id).update(
                             {"SN": sn , "content_blocs": b, "inserted_datetime": datetime.now(), "bloc_sequence":msg}
                             )
@@ -197,6 +196,10 @@ def recever_msg():
                 seq = seq.group().hex()
             # seq = re.search(b'(\\x..\\x..\\x..\\x..)' ,response)
                 print(f'SEQ={seq}')
+                session.query(Firmware).filter_by(device_id=device_id,bloc_sequence=seq).update(
+                    {"blocs_acks":response,"reception_datetime": datetime.now()}
+                    )
+                session.commit()
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response) or re.search(b'.*RAX.*',response) or re.search(b'.*RTT.*',response):
         # else:
             send_ack(sock, addr, response)
