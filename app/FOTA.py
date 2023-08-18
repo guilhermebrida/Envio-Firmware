@@ -181,10 +181,10 @@ def recever_msg():
                 print(f"SN={sn}")
                 RSN_DICT[device_id] = sn
         if re.search(b'BINAVRFB.*',response):
-            response_ = re.sub(b'\n', b'', response)
-            seq = re.search(b'\x80\x00.{2}' ,response_)
+            seq = response.hex()
+            seq = re.search(r'8000.{4}' ,seq)
             if seq is not None:
-                seq = seq.group().hex().upper()
+                seq = seq.group().upper()
                 print(f'SEQ={seq}')
                 session.query(Firmware).filter_by(device_id=device_id,bloc_sequence=seq).update(
                     {"blocs_acks":response,"reception_datetime": datetime.now()}
