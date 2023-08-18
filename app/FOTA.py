@@ -183,7 +183,7 @@ def recever_msg():
         ip_equipamento = addr[0]
         print(response,ip_equipamento)
         print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {response}')
-        if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response):
+        if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response) or re.search(b'.*RAX.*',response):
             send_ack(sock, addr, response)
         result = re.search(b'RSN.*', response)
         if result is not None:
