@@ -192,7 +192,6 @@ def recever_msg():
                 print(f"SN={sn}")
                 RSN_DICT[device_id] = sn
         if re.search(b'BINAVRFB.*',response):
-            print(response.decode('latin-1'))
             seq = re.search(rb'x80\\x..\\x..\\x..' ,response)
             print(f'SEQ={seq}')
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response) or re.search(b'.*RAX.*',response) or re.search(b'.*RTT.*',response):
