@@ -192,7 +192,7 @@ def recever_msg():
                 print(f"SN={sn}")
                 RSN_DICT[device_id] = sn
         if re.search(b'BINAVRFB.*',response):
-            seq = re.search(b'\x80\x00.{2}' ,response)
+            seq = re.search(b'\x80\x00.{2}' ,response).group()
             # seq = re.search(b'(\\x..\\x..\\x..\\x..)' ,response)
             print(f'SEQ={seq}')
         if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response) or re.search(b'.*RAX.*',response) or re.search(b'.*RTT.*',response):
@@ -235,7 +235,7 @@ def Verifica_tabela(device_id):
         select(Firmware.content_blocs)
         .where(
         # (Firmware.device_id == device_id)&
-        (Firmware.blocs_acks == None))
+        (Firmware.blocs_acks == None)).oder_by(Firmware.bloc_sequence.asc())
     )
     
     result = session.execute(stmt)
