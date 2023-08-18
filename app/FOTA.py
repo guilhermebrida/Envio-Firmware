@@ -285,6 +285,7 @@ def sending_bytes(device_id, addr,blocos_de_dados):
             #     {"blocs_acks":res,"reception_datetime": datetime.now()}
             #     )
             #     session.commit()
+            time.sleep(5)
         print('atualizado!')
         return True
         # else:
