@@ -177,9 +177,9 @@ def recever_msg():
     global device_id
     global addr
     while True:
+        response,addr = sock.recvfrom(1024)
         print("===================================================================================")
         print("== recever_msg()")
-        response,addr = sock.recvfrom(1024)
         ip_equipamento = addr[0]
         print(response,ip_equipamento)
         print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {response}')
