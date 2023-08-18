@@ -183,13 +183,6 @@ def recever_msg():
         ip_equipamento = addr[0]
         print(response,ip_equipamento)
         print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {response}')
-        if re.search(b'BINAVRFB.*',response):
-            print(response.decode('latin-1'))
-            seq = re.search(r'x80\\x..\\x..\\x..' ,response.decode('latin-1'))
-            print(f'SEQ={seq}')
-        if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response) or re.search(b'.*RAX.*',response) or re.search(b'.*RTT.*',response):
-        # else:
-            send_ack(sock, addr, response)
         result = re.search(b'RSN.*', response)
         if result is not None:
             rsn = result.group().decode()
@@ -198,6 +191,13 @@ def recever_msg():
                 print(f'device_id={device_id}')
                 print(f"SN={sn}")
                 RSN_DICT[device_id] = sn
+        if re.search(b'BINAVRFB.*',response):
+            print(response.decode('latin-1'))
+            seq = re.search(rb'x80\\x..\\x..\\x..' ,response)
+            print(f'SEQ={seq}')
+        if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response) or re.search(b'.*RAX.*',response) or re.search(b'.*RTT.*',response):
+        # else:
+            send_ack(sock, addr, response)
         # if re.search(b'BINA.*ACK.*',response):
             # session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
             # {"blocs_acks":response,"reception_datetime": datetime.now()}
