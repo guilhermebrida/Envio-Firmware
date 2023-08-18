@@ -188,7 +188,7 @@ def recever_msg():
         result = re.search(b'RSN.*', response)
         if result is not None:
             rsn = result.group()
-            sn = rsn.split('_')[0].split('RSN')[1]
+            sn = rsn.split('_')[0].split(b'RSN')[1]
             if sn:
                 print(f'device_id={device_id}')
                 print(f"SN={sn}")
