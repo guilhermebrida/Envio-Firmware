@@ -183,7 +183,7 @@ def recever_msg():
         if re.search(b'BINAVRFB.*',response):
             seq = re.search(b'\x80\x00.{2}' ,response)
             if seq is not None:
-                seq = seq.group().hex()
+                seq = seq.group().hex().upper()
                 print(f'SEQ={seq}')
                 session.query(Firmware).filter_by(device_id=device_id,bloc_sequence=seq).update(
                     {"blocs_acks":response,"reception_datetime": datetime.now()}
