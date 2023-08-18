@@ -185,7 +185,7 @@ def recever_msg():
         print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {response}')
         if re.search(b'BINAVRFB.*',response):
             print(f'{response}   {response[-16::]}')
-            seq = re.search(r'x80\\x..\\x..\\x..' ,response)
+            seq = re.search(r'x80\\x..\\x..\\x..' ,response.decode('latin-1'))
             print(f'SEQ={seq}')
         # if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response) or re.search(b'.*RAX.*',response):
         else:
