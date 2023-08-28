@@ -15,7 +15,12 @@ services:
     networks:
       - app-network
 
+# networks: 
+#   app-network:
+#     external: 
+#      name: backing-services
+
 networks: 
   app-network:
-    external: 
      name: backing-services
+     external: true

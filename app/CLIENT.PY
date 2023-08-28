@@ -1,10 +1,9 @@
 import socket
 import XVM
 
-# UDP_IP = "192.168.0.116"
-# UDP_IP = "191.4.146.247"
-# UDP_IP = "191.4.157.126"
-UDP_IP = "18.230.78.246"
+UDP_IP = "192.168.10.187"
+# UDP_IP = "18.228.195.73"
+# UDP_IP = "localhost"
 UDP_PORT = 10116
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
