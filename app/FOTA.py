@@ -19,6 +19,7 @@ sys.path.append(diretorio_projeto)
 import app.XVM as XVM
 import tenacity
 
+
 ips = []
 RSN_DICT = {}
 cabeçalho =  'BINAVSFB'
@@ -53,6 +54,7 @@ postgres_db = os.environ['POSTGRES_DB']
 
 
 host = '0.0.0.0'
+# host = 'localhost'
 porta = 10116
 equipamentos_executados = {}
 blocos_de_dados = [...]  
@@ -190,7 +192,8 @@ def recever_msg():
                     {"blocs_acks":response,"reception_datetime": datetime.now()}
                     )
                 session.commit()
-        # if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response) or re.search(b'.*RAX.*',response) or re.search(b'.*RTT.*',response):
+        if re.search(b'RUV.*',response) or re.search(b'.*NAK.*',response) or re.search(b'.*RAX.*',response) or re.search(b'.*RTT.*',response):
+            send_ack(sock, addr, response)
         else:
             send_ack(sock, addr, response)
 
@@ -261,7 +264,7 @@ def sending_bytes(device_id, addr,blocos_de_dados):
             )
             session.commit()
             res = enviar_mensagem_udp(sock, addr, bloco)
-            time.sleep(4)
+            time.sleep(2)
         print('atualizado!')
         return True
         # else:
