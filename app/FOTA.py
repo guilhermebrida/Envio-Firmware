@@ -264,7 +264,7 @@ def sending_bytes(device_id, addr,blocos_de_dados):
             )
             session.commit()
             res = enviar_mensagem_udp(sock, addr, bloco)
-            time.sleep(1)
+            time.sleep(0.5)
         print('atualizado!')
         return True
         # else:
