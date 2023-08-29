@@ -184,6 +184,7 @@ def recever_msg():
                 RSN_DICT[device_id] = sn
         if re.search(b'BINAVRFB.*',response):
             seq = response.hex()
+            print(seq)
             seq = re.search(r'8000.{4}' ,seq)
             if seq is not None:
                 seq = seq.group().upper()
