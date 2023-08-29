@@ -304,6 +304,7 @@ def reload_table(device_id):
             {"blocs_acks":None, "send_datetime": None, "reception_datetime": None}
         )
         session.commit()
+        return False
 
 
 
@@ -339,7 +340,7 @@ async def main():
                         print('END SENDING BYTES',ids_desatualizados)
                         time.sleep(5)
                     else:
-                        reload_table(device_id)
+                        envio = reload_table(device_id)
 
             time.sleep(0.5)
     except KeyboardInterrupt:
