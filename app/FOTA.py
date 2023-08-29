@@ -262,9 +262,9 @@ def sending_bytes(device_id, addr,blocos_de_dados):
             session.query(Firmware).filter_by(device_id=device_id,content_blocs=bloco).update(
                 {"send_datetime": datetime.now()}
             )
-            session.commit()
             res = enviar_mensagem_udp(sock, addr, bloco)
             time.sleep(0.5)
+        session.commit()
         print('atualizado!')
         return True
         # else:
