@@ -286,7 +286,7 @@ def reload_table(device_id):
     )
     res = session.execute(stmt)
     blocos = [row for row in res.scalars()]
-    print('len blocos:'+len(blocos))
+    print('len blocos: '+str(len(blocos)))
     if len(blocos) > 0:
         stmt = (
             select(Firmware.content_blocs)
@@ -296,7 +296,7 @@ def reload_table(device_id):
         )
         result = session.execute(stmt)
         acks = [row for row in result.scalars()]
-        print('len acks:'+len(acks))
+        print('len acks:'+str(len(acks)))
         # for b in blocos:
         # for ack in acks:
             # session.query(Firmware).filter_by(device_id=device_id,blocs_acks=ack).update(
