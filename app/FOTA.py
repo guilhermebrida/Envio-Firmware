@@ -282,16 +282,29 @@ def reload_table(device_id):
         select(Firmware.content_blocs)
         .where(
         (Firmware.device_id == device_id)&
-        (Firmware.blocs_acks != None))
+        (Firmware.blocs_acks == None))
     )
-    result = session.execute(stmt)
-    acks = [row for row in result.scalars()]
-    print(len(acks))
-    for ack in acks:
-        session.query(Firmware).filter_by(device_id=device_id,blocs_acks=ack).update(
+    res = session.execute(stmt)
+    blocos = [row for row in res.scalars()]
+    print('len blocos:'+len(blocos))
+    if len(blocos) > 0:
+        stmt = (
+            select(Firmware.content_blocs)
+            .where(
+            (Firmware.device_id == device_id)&
+            (Firmware.blocs_acks != None))
+        )
+        result = session.execute(stmt)
+        acks = [row for row in result.scalars()]
+        print('len acks:'+len(acks))
+        # for b in blocos:
+        # for ack in acks:
+            # session.query(Firmware).filter_by(device_id=device_id,blocs_acks=ack).update(
+        session.query(Firmware).filter_by(device_id=device_id).update(
             {"blocs_acks":None, "send_datetime": None, "reception_datetime": None}
         )
         session.commit()
+
 
 
 async def main():
@@ -325,6 +338,9 @@ async def main():
                         envio = sending_bytes(device_id, addr, blocos_de_dados)
                         print('END SENDING BYTES',ids_desatualizados)
                         time.sleep(5)
+                    else:
+                        reload_table(device_id)
+
             time.sleep(0.5)
     except KeyboardInterrupt:
         print("CRLT + C")            
