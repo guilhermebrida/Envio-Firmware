@@ -183,8 +183,7 @@ def recever_msg():
                 print(f"SN={sn}")
                 RSN_DICT[device_id] = sn
         if re.search(b'BINAVRFB.*',response):
-            seq = response.hex()
-            print(seq[-20:])
+            seq = response.hex()[-20:]
             seq = re.search(r'8000.{4}' ,seq)
             if seq is not None:
                 seq = seq.group().upper()
@@ -340,8 +339,9 @@ async def main():
                         envio = sending_bytes(device_id, addr, blocos_de_dados)
                         print('END SENDING BYTES',ids_desatualizados)
                         time.sleep(5)
-                    else:
-                        envio = reload_table(device_id)
+                if envio == True:
+                    print('reload table')
+                    envio = reload_table(device_id)
 
             time.sleep(0.5)
     except KeyboardInterrupt:
