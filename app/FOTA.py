@@ -164,13 +164,13 @@ def enviar_mensagem_udp(sock, addr, mensagem):
         sock.sendto(mensagem.encode(), addr)
 
 
-def recever_msg():
+def receber_msg():
     global device_id
     global addr
     while True:
         response,addr = sock.recvfrom(1024)
         print("===================================================================================")
-        print("== recever_msg()")
+        print("== receber_msg()")
         ip_equipamento = addr[0]
         # print(response,ip_equipamento)
         print(f'{datetime.now().strftime("%d/%m/%Y, %H:%M:%S")} {response}')
@@ -264,7 +264,7 @@ def sending_bytes(device_id, addr,blocos_de_dados):
             )
             session.commit()
             res = enviar_mensagem_udp(sock, addr, bloco)
-            time.sleep(0.3)
+            time.sleep(0.5)
         print('atualizado!')
         return True
         # else:
@@ -315,7 +315,7 @@ async def main():
     ids_desatualizados = []
     thread = Thread(target=periodic_query, args=(ids_desatualizados,))
     thread.start()
-    Thread(target=recever_msg).start()
+    Thread(target=receber_msg).start()
     try :
         while True:
             print("===================================================================================")
