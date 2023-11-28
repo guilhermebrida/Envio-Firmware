@@ -23,7 +23,7 @@ def test_regex():
     r = b'\x81\x00\x00\x00\xeb\xab\xcc\xb5'
     if re.search(b'\x80\x00.*', s):
         teste2 = s.hex()
-        teste = re.search('8000.{4}', teste2)
+        teste = re.search(r'8000.{4}', teste2)
         assert teste == teste2
         if re.search(b'\n', teste):
             teste = re.sub(b'\n',b'',teste)

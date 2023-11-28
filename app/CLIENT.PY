@@ -1,7 +1,7 @@
 import socket
 import XVM
 
-UDP_IP = "192.168.10.187"
+UDP_IP = "18.229.150.174"
 # UDP_IP = "18.228.195.73"
 # UDP_IP = "localhost"
 UDP_PORT = 10116

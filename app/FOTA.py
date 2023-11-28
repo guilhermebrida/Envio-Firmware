@@ -346,7 +346,6 @@ async def main():
             time.sleep(0.5)
     except KeyboardInterrupt:
         print("CRLT + C")            
-            # await Verifica_tabela('teste')
 
 
 if __name__ == "__main__":
